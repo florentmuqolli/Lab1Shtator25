@@ -1,0 +1,31 @@
+.hero-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(52,152,219,0.4) !important;
+}
+
+.feature-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important;
+}
+
+.module-card {
+  transition: transform 0.3s ease;
+}
+
+.module-card:hover {
+  transform: translateY(-5px);
+}
+
+@media (max-width: 768px) {
+  .display-4 {
+    font-size: 2.5rem;
+  }
+  
+  .display-5 {
+    font-size: 2rem;
+  }
+}

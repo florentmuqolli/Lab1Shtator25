@@ -1,0 +1,79 @@
+.professional-navbar {
+  padding: 0.5rem 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.nav-link-custom {
+  font-weight: 500;
+  color: #2c3e50 !important;
+  padding: 0.5rem 0.8rem !important;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.nav-link-custom:hover {
+  background-color: #f8f9fa;
+  color: #3498db !important;
+  transform: translateY(-2px);
+}
+
+.navbar-nav .nav-link.active {
+  color: #3498db !important;
+  background-color: rgba(52, 152, 219, 0.1);
+}
+
+.dropdown-menu {
+  border: none;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  padding: 0.5rem;
+}
+
+.dropdown-item {
+  padding: 0.7rem 1.2rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  color: #2c3e50;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+  color: #3498db;
+}
+
+.login-btn {
+  border-color: #3498db;
+  color: #3498db;
+}
+
+.login-btn:hover {
+  background-color: #3498db;
+  border-color: #3498db;
+  color: white;
+}
+
+.demo-btn {
+  background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+  border: none;
+}
+
+.demo-btn:hover {
+  background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+@media (max-width: 991.98px) {
+  .navbar-collapse {
+    padding: 1rem 0;
+  }
+  
+  .nav-link-custom {
+    padding: 0.8rem 1rem !important;
+  }
+  
+  .login-btn, .demo-btn {
+    margin: 0.5rem 0.5rem 0.5rem 0 !important;
+    width: 100%;
+  }
+}

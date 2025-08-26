@@ -1,9 +1,16 @@
 import React, { useState } from 'react';
+import { useNavigate } from "react-router-dom";
 import { Navbar, Nav, Container, NavDropdown, Button } from 'react-bootstrap';
 import "../styles/Header.css"
 
 const Header = () => {
   const [expanded, setExpanded] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLoginClick = () => {
+    setExpanded(false); 
+    navigate("/login");
+  };
 
   return (
     <Navbar 
@@ -15,7 +22,7 @@ const Header = () => {
       style={{ boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}
     >
       <Container>
-        <Navbar.Brand href="#" className="d-flex align-items-center">
+        <Navbar.Brand href="/" className="d-flex align-items-center">
           <div 
             className="brand-icon d-flex align-items-center justify-content-center me-2"
             style={{
@@ -108,6 +115,7 @@ const Header = () => {
               variant="outline-primary" 
               className="ms-2 me-1 login-btn"
               style={{ borderRadius: '20px', fontWeight: '600' }}
+              onClick={handleLoginClick}
             >
               <i className="fas fa-user me-1"></i>Login
             </Button>

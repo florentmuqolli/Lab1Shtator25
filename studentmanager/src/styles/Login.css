@@ -1,0 +1,14 @@
+.btn-primary:hover {
+  background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+  border-color: #2c3e50;
+}
+
+.btn-outline-primary:hover {
+  color: white;
+  background-color: #3498db;
+}
+
+.form-control:focus {
+  border-color: #3498db;
+  box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}

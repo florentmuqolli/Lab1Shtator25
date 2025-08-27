@@ -3,7 +3,6 @@ import { Container, Row, Col, Button, Card } from 'react-bootstrap';
 
 const StartPage = () => (
   <main>
-    {/* Hero Section */}
     <section className="hero-section" style={{ 
       background: 'linear-gradient(135deg, rgba(44,62,80,0.9) 0%, rgba(52,152,219,0.85) 100%), url("https://images.unsplash.com/photo-1541339907198-e08756dedf3f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80") center/cover',
       color: 'white',

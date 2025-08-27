@@ -20,6 +20,7 @@ const Header = () => {
       expanded={expanded}
       className="professional-navbar"
       style={{ boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}
+      data-bs-theme="light"
     >
       <Container>
         <Navbar.Brand href="/" className="d-flex align-items-center">
@@ -118,14 +119,6 @@ const Header = () => {
               onClick={handleLoginClick}
             >
               <i className="fas fa-user me-1"></i>Login
-            </Button>
-            
-            <Button 
-              variant="primary" 
-              className="ms-1 demo-btn"
-              style={{ borderRadius: '20px', fontWeight: '600' }}
-            >
-              <i className="fas fa-play-circle me-1"></i>Demo
             </Button>
           </Nav>
         </Navbar.Collapse>

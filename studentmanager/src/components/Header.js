@@ -11,6 +11,10 @@ const Header = () => {
     setExpanded(false); 
     navigate("/login");
   };
+  const handleTestClick = () => {
+    setExpanded(false); 
+    navigate("/studentdashboard");
+  };
 
   return (
     <Navbar 
@@ -111,6 +115,15 @@ const Header = () => {
                 <i className="fas fa-book me-2"></i>Documentation
               </NavDropdown.Item>
             </NavDropdown>
+
+            <Button 
+              variant="outline-primary" 
+              className="ms-2 me-1 login-btn"
+              style={{ borderRadius: '20px', fontWeight: '600' }}
+              onClick={handleTestClick}
+            >
+              <i className="fas fa-user me-1"></i>Test
+            </Button>
             
             <Button 
               variant="outline-primary" 

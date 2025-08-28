@@ -48,6 +48,10 @@ const DashboardScreen = () => {
     }
   };
 
+  const handleNavigate = () => {
+    navigate('/studentprofile');
+  };
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -87,6 +91,7 @@ const DashboardScreen = () => {
                   Refresh
                 </Button>
                 <div 
+                  onClick={handleNavigate}
                   className="rounded-circle d-flex align-items-center justify-content-center bg-primary text-white"
                   style={{ width: '40px', height: '40px', fontSize: '16px', fontWeight: '600' }}
                 >

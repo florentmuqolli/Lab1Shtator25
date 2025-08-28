@@ -5,6 +5,7 @@ import Header from './components/Header';
 import StartPage from './views/StartPage';
 import Login from './views/authentication/LoginPage';
 import Register from './views/authentication/RegisterPage';
+import ComingSoonScreen from './views/ComingSoonPage';
 import ForgotPassword from './hooks/ForgotPassword';
 import Footer from './components/Footer';
 
@@ -16,6 +17,7 @@ function App() {
           <Route path="/" element={<StartPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/coming-soon" element={<ComingSoonScreen />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
         </Routes>
         <Footer />

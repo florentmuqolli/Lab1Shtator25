@@ -195,7 +195,6 @@ const ForgotPasswordScreen = () => {
         </Row>
       </Container>
 
-      {/* Verification Modal */}
       <Modal show={verificationModalVisible} onHide={() => setVerificationModalVisible(false)} centered>
         <Modal.Body className="p-4" style={{ borderRadius: '15px' }}>
           <div className="text-center mb-4">
@@ -262,7 +261,6 @@ const ForgotPasswordScreen = () => {
         </Modal.Body>
       </Modal>
 
-      {/* Password Reset Modal */}
       <Modal show={passwordResetModalVisible} onHide={() => setPasswordResetModalVisible(false)} centered>
         <Modal.Body className="p-4" style={{ borderRadius: '15px' }}>
           <div className="text-center mb-4">

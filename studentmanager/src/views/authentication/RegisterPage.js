@@ -75,6 +75,10 @@ const Register = () => {
     navigate('/login');
   };
 
+  const handleNavigate = () => {
+    navigate('/coming-soon');
+  };
+
   if (loading) {
     return (
       <div className="d-flex justify-content-center align-items-center min-vh-100" style={{ 
@@ -233,6 +237,7 @@ const Register = () => {
                 </div>
 
                 <Button
+                  onClick={handleNavigate}
                   variant="outline-primary"
                   className="w-100 py-3"
                   style={{ 

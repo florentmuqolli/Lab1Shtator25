@@ -5,7 +5,7 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const ClassesScreen = () => {
+const Classes = () => {
   const navigate = useNavigate();
   const [myClasses, setMyClasses] = useState([]);
   const [allClasses, setAllClasses] = useState([]);

@@ -6,11 +6,13 @@ import StartPage from './views/StartPage';
 import Login from './views/authentication/LoginPage';
 import Register from './views/authentication/RegisterPage';
 import StudentDashboard from './views/student/StudentHome';
-import ClassesScreen from './views/student/ClassesScreen';
+import Classes from './views/student/Classes';
+import Grades from './views/student/Grades';
 import ProfilePage from './views/student/StudentProfile';
 import ComingSoonScreen from './views/ComingSoonPage';
 import ForgotPassword from './hooks/ForgotPassword';
 import Footer from './components/Footer';
+import Classes from './views/student/Classes';
 
 function App() {
   return (
@@ -21,7 +23,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/studentdashboard" element={<StudentDashboard />} />
-          <Route path="/classesscreen" element={<ClassesScreen />} />
+          <Route path="/classes" element={<Classes />} />
+          <Route path="/grades" element={<Grades />} />
           <Route path="/studentprofile" element={<ProfilePage />} />
           <Route path="/coming-soon" element={<ComingSoonScreen />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />

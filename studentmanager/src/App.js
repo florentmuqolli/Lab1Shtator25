@@ -11,6 +11,7 @@ import Grades from './views/student/Grades';
 import Calendar from './views/student/Calendar';
 import Assignments from './views/student/Assignments';
 import ProfilePage from './views/teacher/TeacherDashboard';
+import MyClasses from './views/teacher/MyClasses';
 import ProfilePage from './views/student/StudentProfile';
 import ComingSoonScreen from './views/ComingSoonPage';
 import ForgotPassword from './hooks/ForgotPassword';
@@ -31,6 +32,7 @@ function App() {
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/assignments" element={<Assignments />} />
           <Route path="/teacherdashboard" element={<TeacherDashboard />} />
+          <Route path="/myclasses" element={<MyClasses />} />
           <Route path="/studentprofile" element={<ProfilePage />} />
           <Route path="/coming-soon" element={<ComingSoonScreen />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />

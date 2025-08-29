@@ -9,6 +9,7 @@ import StudentDashboard from './views/student/StudentHome';
 import Classes from './views/student/Classes';
 import Grades from './views/student/Grades';
 import Calendar from './views/student/Calendar';
+import Assignments from './views/student/Assignments';
 import ProfilePage from './views/student/StudentProfile';
 import ComingSoonScreen from './views/ComingSoonPage';
 import ForgotPassword from './hooks/ForgotPassword';
@@ -27,6 +28,7 @@ function App() {
           <Route path="/classes" element={<Classes />} />
           <Route path="/grades" element={<Grades />} />
           <Route path="/calendar" element={<Calendar />} />
+          <Route path="/assignments" element={<Assignments />} />
           <Route path="/studentprofile" element={<ProfilePage />} />
           <Route path="/coming-soon" element={<ComingSoonScreen />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />

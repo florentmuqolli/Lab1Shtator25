@@ -14,6 +14,7 @@ import ProfilePage from './views/teacher/TeacherDashboard';
 import MyClasses from './views/teacher/MyClasses';
 import AssignmentsTeacher from './views/teacher/AssignmentsTeacher';
 import GradesTeacher from './views/teacher/GradesTeacher';
+import AssignmentForm from './views/teacher/utils/AssignmentForm';
 import ProfilePage from './views/student/StudentProfile';
 import ComingSoonScreen from './views/ComingSoonPage';
 import ForgotPassword from './hooks/ForgotPassword';
@@ -37,6 +38,7 @@ function App() {
           <Route path="/myclasses" element={<MyClasses />} />
           <Route path="/assignmentsteacher" element={<AssignmentsTeacher />} />
           <Route path="/gradesteacher" element={<GradesTeacher />} />
+          <Route path="/assignmentform" element={<AssignmentForm />} />
           <Route path="/studentprofile" element={<ProfilePage />} />
           <Route path="/coming-soon" element={<ComingSoonScreen />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />

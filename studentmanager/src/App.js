@@ -6,6 +6,7 @@ import StartPage from './views/StartPage';
 import Login from './views/authentication/LoginPage';
 import Register from './views/authentication/RegisterPage';
 import StudentDashboard from './views/student/StudentHome';
+import TeacherDashboard from './views/teacher/TeacherDashboard';
 import Classes from './views/student/Classes';
 import Grades from './views/student/Grades';
 import Calendar from './views/student/Calendar';
@@ -16,11 +17,9 @@ import AssignmentsTeacher from './views/teacher/AssignmentsTeacher';
 import GradesTeacher from './views/teacher/GradesTeacher';
 import AssignmentForm from './views/teacher/utils/AssignmentForm';
 import AssignmentStats from './views/teacher/utils/AssignmentStats';
-import ProfilePage from './views/student/StudentProfile';
 import ComingSoonScreen from './views/ComingSoonPage';
 import ForgotPassword from './hooks/ForgotPassword';
 import Footer from './components/Footer';
-import Classes from './views/student/Classes';
 
 function App() {
   return (

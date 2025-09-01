@@ -7,6 +7,7 @@ import Login from './views/authentication/LoginPage';
 import Register from './views/authentication/RegisterPage';
 import StudentDashboard from './views/student/StudentHome';
 import TeacherDashboard from './views/teacher/TeacherDashboard';
+import AdminDashboard from './views/admin/AdminDashboard';
 import Classes from './views/student/Classes';
 import Grades from './views/student/Grades';
 import Calendar from './views/student/Calendar';
@@ -29,12 +30,13 @@ function App() {
           <Route path="/" element={<StartPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/studentdashboard" element={<StudentDashboard />} />
+          <Route path="/student-dashboard" element={<StudentDashboard />} />
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
           <Route path="/classes" element={<Classes />} />
           <Route path="/grades" element={<Grades />} />
           <Route path="/calendar" element={<Calendar />} />
           <Route path="/assignments" element={<Assignments />} />
-          <Route path="/teacherdashboard" element={<TeacherDashboard />} />
+          <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
           <Route path="/myclasses" element={<MyClasses />} />
           <Route path="/assignmentsteacher" element={<AssignmentsTeacher />} />
           <Route path="/gradesteacher" element={<GradesTeacher />} />

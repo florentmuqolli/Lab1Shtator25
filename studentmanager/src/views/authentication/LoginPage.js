@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Form, Button, Card, Modal, Spinner } from "react-bootstrap";
 import { useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import api from "../../services/api";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../../styles/Login.css";
@@ -42,7 +42,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await axios.post("/auth/login", form, {
+      const response = await api.post("/auth/login", form, {
         withCredentials: true,
       });
 
@@ -86,7 +86,7 @@ const Login = () => {
     setStatusMessage('');
     
     try {
-      const res = await axios.get(`/auth/check-request-status?email=${queryEmail}`);
+      const res = await api.get(`/auth/check-request-status?email=${queryEmail}`);
       const { status } = res.data;
       
       if (status === 'approved') {
@@ -187,6 +187,7 @@ const Login = () => {
                     type="submit"
                     className="w-100 py-3 fw-semibold border-0"
                     disabled={loading || !form.email || !form.password}
+                    onClick={handleSubmit}
                     style={{ 
                       borderRadius: '10px',
                       background: 'linear-gradient(135deg, #3498db 0%, #2c3e50 100%)',

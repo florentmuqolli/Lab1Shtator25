@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axiosInstance from '../../services/axiosInstance';
-//import ScreenWrapper from '../../hooks/ScreenWrapper';
-//import UserTypeSelectionModal from './utils/UserTypeSelection';
+import ScreenWrapper from '../../hooks/ScreenWrapper';
+import UserTypeSelectionModal from './utils/UserTypeSelection';
 import useLogout from "../../hooks/Logout";
 import { RefreshIcon, LogoutIcon } from '../../assets/Icons';
-import '../../styles/AdminDashboard.css';
+//import '../../styles/AdminDashboard.css';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -103,7 +103,7 @@ const AdminDashboard = () => {
   }
 
   return (
-    //<ScreenWrapper>
+    <ScreenWrapper>
       <div className="container">
         <div className="header">
           <div>
@@ -247,13 +247,13 @@ const AdminDashboard = () => {
           )}
         </div>
 
-        {/*<UserTypeSelectionModal
+        <UserTypeSelectionModal
           visible={showUserModal}
           onClose={() => setShowUserModal(false)}
           navigation={{ navigate }}
-        />*/}
+        />
       </div>
-    //</ScreenWrapper>
+    </ScreenWrapper>
   );
 };
 

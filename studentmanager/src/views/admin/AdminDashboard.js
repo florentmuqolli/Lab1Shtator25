@@ -5,7 +5,7 @@ import ScreenWrapper from '../../hooks/ScreenWrapper';
 import UserTypeSelectionModal from './utils/UserTypeSelection';
 import useLogout from "../../hooks/Logout";
 import { RefreshIcon, LogoutIcon } from '../../assets/Icons';
-//import '../../styles/AdminDashboard.css';
+import '../../styles/AdminDashboard.css';
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -96,19 +96,19 @@ const AdminDashboard = () => {
 
   if (loading) {
     return (
-      <div className="loadingContainer">
-        <div className="activityIndicator" />
+      <div className="admin-loadingContainer">
+        <div className="admin-activityIndicator" />
       </div>
     );
   }
 
   return (
     <ScreenWrapper>
-      <div className="container">
-        <div className="header">
+      <div className="admin-container">
+        <div className="admin-header">
           <div>
-            <div className="greeting">Welcome Admin</div>
-            <div className="date">
+            <div className="admin-greeting">Welcome Admin</div>
+            <div className="admin-date">
               {new Date().toLocaleDateString('en-US', {
                 weekday: 'long',
                 year: 'numeric',
@@ -117,9 +117,9 @@ const AdminDashboard = () => {
               })}
             </div>
           </div>
-          <div className="headerActions">
+          <div className="admin-headerActions">
             <div
-              className="logoutContainer"
+              className="admin-logoutContainer"
               style={{
                 transform: `translateY(${logoutTranslateY.current.value}px)`,
                 opacity: showLogout ? 1 : 0,
@@ -127,24 +127,24 @@ const AdminDashboard = () => {
                 pointerEvents: showLogout ? 'auto' : 'none'
               }}
             >
-              <button className="logoutButton" onClick={handleLogout}>
+              <button className="admin-logoutButton" onClick={handleLogout}>
                 <LogoutIcon />
               </button>
             </div>
             <button onClick={toggleLogout}>
               <img
                 src={require('../../assets/profile_placeholder.png')}
-                className="profileImage"
+                className="admin-profileImage"
                 alt="Profile"
               />
             </button>
           </div>
         </div>
-        <div className="statusBar">
+        <div className="admin-statusBar">
           {elapsedTime && (
-            <div className="lastUpdated">Last updated {elapsedTime}</div>
+            <div className="admin-lastUpdated">Last updated {elapsedTime}</div>
           )}
-          <button className="refreshButton" onClick={() => {
+          <button className="admin-refreshButton" onClick={() => {
             fetchStats();
             fetchRecentActivities();
           }}>
@@ -152,54 +152,54 @@ const AdminDashboard = () => {
           </button>
         </div>
 
-        <div className="statsScrollContainer">
+        <div className="admin-statsScrollContainer">
           {stats ? stats.map(item => (
-            <div key={item.id} className={`statCard ${item.alert ? 'alertCard' : ''}`}>
-              <div className="statIconContainer">
-                <div className="statIcon">{item.icon}</div>
+            <div key={item.id} className={`admin-statCard ${item.alert ? 'admin-alertCard' : ''}`}>
+              <div className="admin-statIconContainer">
+                <div className="admin-statIcon">{item.icon}</div>
               </div>
-              <div className="statValue">{item.value}</div>
-              <div className="statTitle">{item.title}</div>
+              <div className="admin-statValue">{item.value}</div>
+              <div className="admin-statTitle">{item.title}</div>
               {item.change && (
-                <div className="changeBadge">
-                  <div className="changeText">{item.change}</div>
+                <div className="admin-changeBadge">
+                  <div className="admin-changeText">{item.change}</div>
                 </div>
               )}
             </div>
           )) : (
-            <div className="activityIndicator" />
+            <div className="admin-activityIndicator" />
           )}
         </div>
 
-        <div className="tabContainer">
+        <div className="admin-tabContainer">
           {['overview', 'manage', 'reports'].map((tab) => (
             <button
               key={tab}
-              className={`tab ${activeTab === tab ? 'activeTab' : ''}`}
+              className={`admin-tab ${activeTab === tab ? 'admin-activeTab' : ''}`}
               onClick={() => setActiveTab(tab)}
             >
-              <div className={`tabText ${activeTab === tab ? 'activeTabText' : ''}`}>
+              <div className={`admin-tabText ${activeTab === tab ? 'admin-activeTabText' : ''}`}>
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
               </div>
             </button>
           ))}
         </div>
 
-        <div className="content">
+        <div className="admin-content">
           {activeTab === 'overview' && (
             <>
-              <div className="sectionTitle">Recent Activity</div>
-              <div className="activityContainer">
+              <div className="admin-sectionTitle">Recent Activity</div>
+              <div className="admin-activityContainer">
                 {activities.map(item => (
-                  <div key={item.id} className="activityCard">
-                    <div className="activityIconContainer">
-                      <div className="activityIcon">{item.icon}</div>
+                  <div key={item.id} className="admin-activityCard">
+                    <div className="admin-activityIconContainer">
+                      <div className="admin-activityIcon">{item.icon}</div>
                     </div>
-                    <div className="activityText">
-                      <div className="activityUser">{item.user}</div>
-                      <div className="activityAction">{item.action}</div>
+                    <div className="admin-activityText">
+                      <div className="admin-activityUser">{item.user}</div>
+                      <div className="admin-activityAction">{item.action}</div>
                     </div>
-                    <div className="activityTime">
+                    <div className="admin-activityTime">
                       {new Date(item.created_at).toLocaleTimeString('en-US', {
                         weekday: 'short',
                         month: 'short',
@@ -217,8 +217,8 @@ const AdminDashboard = () => {
 
           {activeTab === 'manage' && (
             <>
-              <div className="sectionTitle">Quick Actions</div>
-              <div className="gridContainer">
+              <div className="admin-sectionTitle">Quick Actions</div>
+              <div className="admin-gridContainer">
                 {[
                   { icon: '👥', text: 'Manage Users', color: '#6C5CE7', action: () => setShowUserModal(true) },
                   { icon: '➕', text: 'Add Course', color: '#00B894', action: () => navigate('/course-management') },
@@ -227,13 +227,13 @@ const AdminDashboard = () => {
                 ].map((item, index) => (
                   <button
                     key={index}
-                    className="gridCard"
+                    className="admin-gridCard"
                     onClick={item.action}
                   >
-                    <div className="gridIcon" style={{ backgroundColor: item.color }}>
-                      <div className="gridIconText">{item.icon}</div>
+                    <div className="admin-gridIcon" style={{ backgroundColor: item.color }}>
+                      <div className="admin-gridIconText">{item.icon}</div>
                     </div>
-                    <div className="gridText">{item.text}</div>
+                    <div className="admin-gridText">{item.text}</div>
                   </button>
                 ))}
               </div>
@@ -241,8 +241,8 @@ const AdminDashboard = () => {
           )}
 
           {activeTab === 'reports' && (
-            <div className="comingSoonContainer">
-              <div className="comingSoon">Reporting Tools Coming Soon</div>
+            <div className="admin-comingSoonContainer">
+              <div className="admin-comingSoon">Reporting Tools Coming Soon</div>
             </div>
           )}
         </div>

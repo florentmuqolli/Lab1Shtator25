@@ -110,7 +110,6 @@ exports.login = async (req, res) => {
       user: { id: user._id, name: user.name, email: user.email, role: user.role },
       accessToken,
     });
-
     await ActivityLog.create(user.name, 'logged in', '🔓');
 
   } catch (error) {

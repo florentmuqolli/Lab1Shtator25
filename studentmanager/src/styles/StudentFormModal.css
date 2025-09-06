@@ -1,0 +1,175 @@
+.student-form-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.student-form-modal-container {
+  width: 90%;
+  max-width: 500px;
+  background-color: #FFF;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.student-form-modal-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.student-form-input-group {
+  margin-bottom: 16px;
+}
+
+.student-form-label {
+  font-size: 14px;
+  color: #2c3e50;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.student-form-input {
+  width: 100%;
+  background-color: #F8F9FA;
+  border: 1px solid #DFE6E9;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 16px;
+  color: #2c3e50;
+  box-sizing: border-box;
+}
+
+.student-form-input:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.student-form-input-error {
+  border-color: #e74c3c;
+}
+
+.student-form-error-text {
+  color: #e74c3c;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.student-form-status-container {
+  display: flex;
+  margin-top: 8px;
+}
+
+.student-form-status-button {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #DFE6E9;
+  background: none;
+  cursor: pointer;
+  text-align: center;
+}
+
+.student-form-status-button:first-child {
+  border-radius: 4px 0 0 4px;
+}
+
+.student-form-status-button:last-child {
+  border-radius: 0 4px 4px 0;
+}
+
+.student-form-status-button-text {
+  font-size: 14px;
+  color: #7f8c8d;
+  font-weight: 500;
+}
+
+.student-form-active-status-button {
+  background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+  border-color: #3498db;
+}
+
+.student-form-active-status-button-text {
+  color: #FFF;
+}
+
+.student-form-inactive-status-button {
+  background: #e74c3c;
+  border-color: #e74c3c;
+}
+
+.student-form-inactive-status-button-text {
+  color: #FFF;
+}
+
+.student-form-button-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.student-form-cancel-button {
+  flex: 1;
+  padding: 14px;
+  border: 1px solid #DFE6E9;
+  border-radius: 10px;
+  background: none;
+  cursor: pointer;
+}
+
+.student-form-cancel-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.student-form-cancel-button-text {
+  font-size: 16px;
+  color: #7f8c8d;
+  font-weight: 600;
+}
+
+.student-form-submit-button {
+  flex: 1;
+  padding: 14px;
+  background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  color: white;
+}
+
+.student-form-submit-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.student-form-submit-button-text {
+  font-size: 16px;
+  color: #FFF;
+  font-weight: 600;
+}
+
+.student-form-activity-indicator {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #FFF;
+  border-radius: 50%;
+  animation: student-form-spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes student-form-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

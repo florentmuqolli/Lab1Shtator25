@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import axiosInstance from '../../../services/axiosInstance';
-//import '../../../styles/StudentFormModal.css';
+import '../../../styles/StudentFormModal.css';
 
 const StudentFormModal = ({ visible, onClose, student, refreshStudents }) => {
   const [formData, setFormData] = useState({

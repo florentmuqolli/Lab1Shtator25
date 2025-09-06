@@ -19,7 +19,7 @@ const useLogout = (setLoading) => {
       setTimeout(() => {
         setLoading(false);
         navigate("/login", { replace: true });
-      }, 1000);
+      }, 500);
     } catch (error) {
       console.error("Logout error:", error);
       toast.error(error.response?.data?.message || "Logout failed. Try again later.");

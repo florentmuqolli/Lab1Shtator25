@@ -14,7 +14,7 @@ const UserTypeSelectionModal = ({ visible, onClose, navigation }) => {
           className="option-button"
           onClick={() => {
             onClose();
-            navigation.navigate('StudentManagement');
+            navigation.navigate('student-management');
           }}
         >
           Students
@@ -24,7 +24,7 @@ const UserTypeSelectionModal = ({ visible, onClose, navigation }) => {
           className="option-button"
           onClick={() => {
             onClose();
-            navigation.navigate('TeacherManagement');
+            navigation.navigate('teacher-management');
           }}
         >
           Professors

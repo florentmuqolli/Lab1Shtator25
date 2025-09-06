@@ -1,16 +1,35 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; 
 import { useNavigate } from "react-router-dom";
 import { Navbar, Nav, Container, NavDropdown, Button } from 'react-bootstrap';
+import useLogout from '../hooks/Logout';
 import "../styles/Header.css"
 
 const Header = () => {
   const [expanded, setExpanded] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const handleLogout = useLogout(setLoading);
+
+  useEffect(() => {
+    const checkToken = () => {
+      const token = localStorage.getItem("accessToken");
+      setIsLoggedIn(!!token);
+    };
+
+    checkToken();
+    const interval = setInterval(checkToken, 500);
+
+    return () => clearInterval(interval);
+  }, []);
+
 
   const handleLoginClick = () => {
     setExpanded(false); 
     navigate("/login");
   };
+
   const handleTestClick = () => {
     setExpanded(false); 
     navigate("/studentdashboard");
@@ -59,59 +78,34 @@ const Header = () => {
         
         <Navbar.Collapse id="sm-navbar">
           <Nav className="ms-auto align-items-center">
-            <Nav.Link 
-              href="#features" 
-              className="mx-2 nav-link-custom"
-              onClick={() => setExpanded(false)}
-            >
+            <Nav.Link href="#features" className="mx-2 nav-link-custom" onClick={() => setExpanded(false)}>
               <i className="fas fa-star me-1"></i>Features
             </Nav.Link>
             
-            <Nav.Link 
-              href="#products" 
-              className="mx-2 nav-link-custom"
-              onClick={() => setExpanded(false)}
-            >
+            <Nav.Link href="#products" className="mx-2 nav-link-custom" onClick={() => setExpanded(false)}>
               <i className="fas fa-cubes me-1"></i>Modules
             </Nav.Link>
             
-            <Nav.Link 
-              href="#contact" 
-              className="mx-2 nav-link-custom"
-              onClick={() => setExpanded(false)}
-            >
+            <Nav.Link href="#contact" className="mx-2 nav-link-custom" onClick={() => setExpanded(false)}>
               <i className="fas fa-phone me-1"></i>Contact
             </Nav.Link>
             
             <NavDropdown 
-              title={
-                <span>
-                  <i className="fas fa-ellipsis-h me-1"></i>More
-                </span>
-              } 
+              title={<span><i className="fas fa-ellipsis-h me-1"></i>More</span>} 
               id="nav-dropdown"
               className="mx-2 nav-link-custom"
             >
-              <NavDropdown.Item 
-                href="#about"
-                onClick={() => setExpanded(false)}
-              >
+              <NavDropdown.Item href="#about" onClick={() => setExpanded(false)}>
                 <i className="fas fa-info-circle me-2"></i>About
               </NavDropdown.Item>
               
-              <NavDropdown.Item 
-                href="#support"
-                onClick={() => setExpanded(false)}
-              >
+              <NavDropdown.Item href="#support" onClick={() => setExpanded(false)}>
                 <i className="fas fa-life-ring me-2"></i>Support
               </NavDropdown.Item>
               
               <NavDropdown.Divider />
               
-              <NavDropdown.Item 
-                href="#docs"
-                onClick={() => setExpanded(false)}
-              >
+              <NavDropdown.Item href="#docs" onClick={() => setExpanded(false)}>
                 <i className="fas fa-book me-2"></i>Documentation
               </NavDropdown.Item>
             </NavDropdown>
@@ -125,14 +119,30 @@ const Header = () => {
               <i className="fas fa-user me-1"></i>Test
             </Button>
             
-            <Button 
-              variant="outline-primary" 
-              className="ms-2 me-1 login-btn"
-              style={{ borderRadius: '20px', fontWeight: '600' }}
-              onClick={handleLoginClick}
-            >
-              <i className="fas fa-user me-1"></i>Login
-            </Button>
+            {isLoggedIn ? (
+              <Button 
+                variant="outline-danger" 
+                className="ms-2 me-1 login-btn"
+                style={{ borderRadius: '20px', fontWeight: '600' }}
+                onClick={() => {
+                  setExpanded(false);
+                  handleLogout(); 
+                }}
+                disabled={loading}
+              >
+                <i className="fas fa-sign-out-alt me-1"></i>
+                {loading ? "Logging out..." : "Logout"}
+              </Button>
+            ) : (
+              <Button 
+                variant="outline-primary" 
+                className="ms-2 me-1 login-btn"
+                style={{ borderRadius: '20px', fontWeight: '600' }}
+                onClick={handleLoginClick}
+              >
+                <i className="fas fa-sign-in-alt me-1"></i>Login
+              </Button>
+            )}
           </Nav>
         </Navbar.Collapse>
       </Container>

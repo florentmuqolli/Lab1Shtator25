@@ -8,6 +8,7 @@ import Register from './views/authentication/RegisterPage';
 import StudentDashboard from './views/student/StudentHome';
 import TeacherDashboard from './views/teacher/TeacherDashboard';
 import AdminDashboard from './views/admin/AdminDashboard';
+import StudentManagement from './views/admin/StudentManagement';
 import Classes from './views/student/Classes';
 import Grades from './views/student/Grades';
 import Calendar from './views/student/Calendar';
@@ -32,6 +33,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/student-dashboard" element={<StudentDashboard />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/student-management" element={<StudentManagement />} />
           <Route path="/classes" element={<Classes />} />
           <Route path="/grades" element={<Grades />} />
           <Route path="/calendar" element={<Calendar />} />

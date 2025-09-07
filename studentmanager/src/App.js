@@ -13,6 +13,7 @@ import StudentManagement from './views/admin/StudentManagement';
 import CourseManagement from './views/admin/CourseManagement';
 import TeacherManagement from './views/admin/TeacherManagement';
 import EnrollmentManagement from './views/admin/EnrollmentManagement';
+import EnrollmentFormModal from './views/admin/utils/EnrollmentFormModal';
 import Classes from './views/student/Classes';
 import Grades from './views/student/Grades';
 import Calendar from './views/student/Calendar';
@@ -54,6 +55,7 @@ function Layout() {
         <Route path="/coursemanagement" element={<CourseManagement />} />
         <Route path="/teachermanagement" element={<TeacherManagement />} />
         <Route path="/enrollmentmanagement" element={<EnrollmentManagement />} />
+        <Route path="/enrollmentformmodal" element={<EnrollmentFormModal />} />
         <Route path="/classes" element={<Classes />} />
         <Route path="/grades" element={<Grades />} />
         <Route path="/calendar" element={<Calendar />} />

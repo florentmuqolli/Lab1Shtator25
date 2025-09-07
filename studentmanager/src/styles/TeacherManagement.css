@@ -1,0 +1,240 @@
+.teacher-loadingContainer {
+  display: flex;
+  flex: 1;
+  background-color: #f8f9fa;
+  justify-content: center;
+  align-items: center;
+}
+
+.teacher-activityIndicator {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  animation: teacher-spin 1s linear infinite;
+}
+
+@keyframes teacher-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.teacher-container {
+  flex: 1;
+  background-color: #F8F9FA;
+  padding: 16px;
+  min-height: 100vh;
+}
+
+.teacher-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.teacher-backButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.teacher-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.teacher-actionBar {
+  display: flex;
+  margin-bottom: 16px;
+  gap: 10px;
+}
+
+.teacher-searchContainer {
+  flex: 1;
+  display: flex;
+  background-color: #FFF;
+  border-radius: 10px;
+  padding: 0 15px;
+  border: 1px solid #DFE6E9;
+  align-items: center;
+}
+
+.teacher-searchInput {
+  flex: 1;
+  color: #2c3e50;
+  font-size: 14px;
+  margin-left: 8px;
+  border: none;
+  outline: none;
+  padding: 10px 0;
+}
+
+.teacher-addButton {
+  display: flex;
+  background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+  border-radius: 10px;
+  padding: 0 12px;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
+  border: none;
+  cursor: pointer;
+  color: white;
+}
+
+.teacher-addButtonText {
+  color: #FFF;
+  font-size: 14px;
+  font-weight: 600;
+  margin-left: 6px;
+}
+
+.teacher-cardContainer {
+  flex: 1;
+  padding: 8px;
+  overflow-y: auto;
+}
+
+.teacher-card {
+  background-color: #FFF;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.teacher-cardHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.teacher-cardName {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2c3e50;
+  flex: 1;
+  min-width: 120px;
+}
+
+.teacher-cardEmail {
+  font-size: 14px;
+  color: #7f8c8d;
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+
+.teacher-cardActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.teacher-cardButton {
+  display: flex;
+  align-items: center;
+  background-color: #EDE7F6;
+  border-radius: 8px;
+  padding: 6px 12px;
+  border: none;
+  cursor: pointer;
+}
+
+.teacher-deleteButton {
+  background-color: #FFEBEE;
+}
+
+.teacher-cardButtonText {
+  font-size: 14px;
+  color: #3498db;
+  margin-left: 6px;
+  font-weight: 500;
+}
+
+.teacher-deleteButtonText {
+  color: #FF5252;
+}
+
+.teacher-statusBadge {
+  padding: 3px 6px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.teacher-activeBadge {
+  background-color: #E3F9E5;
+  color: #27ae60;
+}
+
+.teacher-inactiveBadge {
+  background-color: #FFEBEE;
+  color: #e74c3c;
+}
+
+.teacher-statusText {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Empty State Styles */
+.teacher-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  background: linear-gradient(135deg, rgba(52,152,219,0.05) 0%, rgba(44,62,80,0.05) 100%);
+  border-radius: 16px;
+  margin: 20px 0;
+}
+
+.teacher-empty-icon {
+  margin-bottom: 20px;
+  opacity: 0.7;
+}
+
+.teacher-empty-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 12px;
+}
+
+.teacher-empty-description {
+  font-size: 16px;
+  color: #7f8c8d;
+  margin-bottom: 24px;
+  max-width: 400px;
+  line-height: 1.5;
+}
+
+.teacher-empty-action-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 15px rgba(52,152,219,0.3);
+}
+
+.teacher-empty-action-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(52,152,219,0.4);
+}

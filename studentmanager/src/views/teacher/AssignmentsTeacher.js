@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Form, Spinner, Badge, Modal, Table } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const TeacherAssignments = () => {
@@ -118,8 +118,6 @@ const TeacherAssignments = () => {
 
   return (
     <div className="bg-light min-vh-100">
-      <ToastContainer position="top-right" autoClose={3000} />
-      
       {}
       <div className="bg-white shadow-sm py-3">
         <Container>

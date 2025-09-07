@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Modal, Button, Form, Spinner, Alert, Row, Col, Card } from 'react-bootstrap';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 
@@ -95,8 +95,6 @@ const AssignmentFormModal = ({ visible, onClose, assignment, refreshAssignments 
 
   return (
     <>
-      <ToastContainer position="top-right" autoClose={3000} />
-      
       <Modal show={visible} onHide={onClose} centered size="lg">
         <Modal.Header closeButton className="border-0 pb-0">
           <Modal.Title className="fw-bold text-dark">

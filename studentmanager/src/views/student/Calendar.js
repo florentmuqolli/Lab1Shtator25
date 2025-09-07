@@ -8,7 +8,7 @@ const Calendar = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   const monthNames = ["January", "February", "March", "April", "May", "June",
-                     "July", "August", "September", "October", "November", "December"];
+    "July", "August", "September", "October", "November", "December"];
 
   const getDaysInMonth = (date) => {
     return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();

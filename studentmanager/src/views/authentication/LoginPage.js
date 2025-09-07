@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Form, Button, Card, Modal, Spinner } from "react-bootstrap";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../../services/api";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "../../styles/Login.css";
 
@@ -120,8 +120,7 @@ const Login = () => {
     <div className="min-vh-100" style={{ 
       background: 'linear-gradient(135deg, rgba(44,62,80,0.05) 0%, rgba(52,152,219,0.05) 100%)' 
     }}>
-      <ToastContainer position="top-right" autoClose={5000} />
-      
+
       <Container className="py-5">
         <Row className="justify-content-center">
           <Col md={8} lg={6}>

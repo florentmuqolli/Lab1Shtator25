@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
+import { ToastContainer } from "react-toastify";
 import 'bootstrap/dist/css/bootstrap.css';
 import Header from './components/Header';
 import StartPage from './views/StartPage';
@@ -70,6 +71,7 @@ function App() {
   return (
     <BrowserRouter>
       <Layout />
+      <ToastContainer position="top-right" autoClose={5000} />
     </BrowserRouter>
   );
 }

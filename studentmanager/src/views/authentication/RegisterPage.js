@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Form, Button, Modal, Spinner, Card } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Register = () => {
@@ -93,7 +93,6 @@ const Register = () => {
     <div className="min-vh-100 d-flex align-items-center justify-content-center py-5" style={{ 
       background: 'linear-gradient(135deg, rgba(44,62,80,0.05) 0%, rgba(52,152,219,0.05) 100%)' 
     }}>
-      <ToastContainer position="top-right" autoClose={5000} />
       
       <Container>
         <Row className="justify-content-center">

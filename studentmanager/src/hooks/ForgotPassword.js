@@ -104,7 +104,6 @@ const ForgotPasswordScreen = () => {
     <div className="min-vh-100 d-flex align-items-center justify-content-center py-5" style={{ 
       background: 'linear-gradient(135deg, rgba(44,62,80,0.05) 0%, rgba(52,152,219,0.05) 100%)' 
     }}>
-      <ToastContainer position="top-right" autoClose={5000} />
       
       <Container>
         <Row className="justify-content-center">

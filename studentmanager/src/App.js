@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.css';
 import Header from './components/Header';
 import StartPage from './views/StartPage';
@@ -23,32 +23,53 @@ import ComingSoonScreen from './views/ComingSoonPage';
 import ForgotPassword from './hooks/ForgotPassword';
 import Footer from './components/Footer';
 
+function Layout() {
+  const location = useLocation();
+
+  const hideHeaderRoutes = [
+    "/admin-dashboard",
+    "/studentmanagement",
+    "/login",
+    "/register",
+    "/forgot-password"
+  ];
+
+
+  const shouldHideHeader = hideHeaderRoutes.includes(location.pathname);
+
+  return (
+    <>
+      {!shouldHideHeader && <Header />}
+      <Routes>
+        <Route path="/" element={<StartPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/student-dashboard" element={<StudentDashboard />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/studentmanagement" element={<StudentManagement />} />
+        <Route path="/classes" element={<Classes />} />
+        <Route path="/grades" element={<Grades />} />
+        <Route path="/calendar" element={<Calendar />} />
+        <Route path="/assignments" element={<Assignments />} />
+        <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
+        <Route path="/myclasses" element={<MyClasses />} />
+        <Route path="/assignmentsteacher" element={<AssignmentsTeacher />} />
+        <Route path="/gradesteacher" element={<GradesTeacher />} />
+        <Route path="/assignmentform" element={<AssignmentForm />} />
+        <Route path="/assignmentstats" element={<AssignmentStats />} />
+        <Route path="/studentprofile" element={<ProfilePage />} />
+        <Route path="/coming-soon" element={<ComingSoonScreen />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+      </Routes>
+      <Footer />
+    </>
+  );
+}
+
 function App() {
   return (
     <BrowserRouter>
-        <Header />
-        <Routes>
-          <Route path="/" element={<StartPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/student-dashboard" element={<StudentDashboard />} />
-          <Route path="/admin-dashboard" element={<AdminDashboard />} />
-          <Route path="/studentmanagement" element={<StudentManagement />} />
-          <Route path="/classes" element={<Classes />} />
-          <Route path="/grades" element={<Grades />} />
-          <Route path="/calendar" element={<Calendar />} />
-          <Route path="/assignments" element={<Assignments />} />
-          <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
-          <Route path="/myclasses" element={<MyClasses />} />
-          <Route path="/assignmentsteacher" element={<AssignmentsTeacher />} />
-          <Route path="/gradesteacher" element={<GradesTeacher />} />
-          <Route path="/assignmentform" element={<AssignmentForm />} />
-          <Route path="/assignmentstats" element={<AssignmentStats />} />
-          <Route path="/studentprofile" element={<ProfilePage />} />
-          <Route path="/coming-soon" element={<ComingSoonScreen />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-        </Routes>
-        <Footer />
+      <Layout />
     </BrowserRouter>
   );
 }

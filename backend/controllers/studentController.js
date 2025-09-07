@@ -62,7 +62,8 @@ exports.createStudent = async (req, res) => {
       status: status || 'Active',
       user_id: user._id.toString(),
     });
-    await ActivityLog.create(req.user.name, 'added a new student', '👨‍🎓');
+
+    await ActivityLog.create(req.user?.name, 'added a new student', '👨‍🎓');
 
     res.status(201).json({
       id: result.insertId,
@@ -120,7 +121,7 @@ exports.deleteStudent = async (req, res) => {
 
     await Student.delete(studentId);
 
-    await ActivityLog.create(req.user.name, 'deleted a student', '👨‍🎓');
+    await ActivityLog.create(req.user?.name, 'deleted a student', '👨‍🎓');
 
     res.json({ message: 'Student deleted successfully' });
   } catch (error) {

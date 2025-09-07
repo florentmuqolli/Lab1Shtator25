@@ -18,7 +18,7 @@ const AdminDashboard = () => {
   const [lastUpdated, setLastUpdated] = useState(null);
   const [elapsedTime, setElapsedTime] = useState('');
   const [showLogout, setShowLogout] = useState(false);
-  const logoutTranslateY = useRef({ value: 0 });
+  const logoutTranslateX = useRef({ value: 0 });
 
   useEffect(() => {
     if (!lastUpdated) return;
@@ -38,11 +38,11 @@ const AdminDashboard = () => {
 
   const toggleLogout = () => {
     if (showLogout) {
-      logoutTranslateY.current = { value: 0 };
+      logoutTranslateX.current = { value: 0 };
       setShowLogout(false);
     } else {
       setShowLogout(true);
-      logoutTranslateY.current = { value: -60 };
+      logoutTranslateX.current = { value: -70 };
     }
   };
 
@@ -121,7 +121,7 @@ const AdminDashboard = () => {
             <div
               className="admin-logoutContainer"
               style={{
-                transform: `translateY(${logoutTranslateY.current.value}px)`,
+                transform: `translateX(${logoutTranslateX.current.value}px)`,
                 opacity: showLogout ? 1 : 0,
                 zIndex: showLogout ? 1 : 0,
                 pointerEvents: showLogout ? 'auto' : 'none'
@@ -131,7 +131,7 @@ const AdminDashboard = () => {
                 <LogoutIcon />
               </button>
             </div>
-            <button onClick={toggleLogout}>
+            <button onClick={toggleLogout} className='profile-button'>
               <img
                 src={require('../../assets/profile_placeholder.png')}
                 className="admin-profileImage"

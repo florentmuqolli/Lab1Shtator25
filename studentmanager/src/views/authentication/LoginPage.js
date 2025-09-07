@@ -62,6 +62,7 @@ const Login = () => {
         }
       }, 1000);
     } catch (error) {
+      console.error(error);
       setLoading(false);
       const status = error.response?.status;
       const message = error.response?.data?.message || "Something went wrong";

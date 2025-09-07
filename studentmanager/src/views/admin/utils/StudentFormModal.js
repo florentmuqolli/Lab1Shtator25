@@ -62,7 +62,6 @@ const StudentFormModal = ({ visible, onClose, student, refreshStudents }) => {
         toast.success("Student Updated");
       } else {
         await axiosInstance.post('/students', formData);
-        console.log("formData: ",formData);
         toast.success("Student Created");
       }
       refreshStudents();

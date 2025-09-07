@@ -1,0 +1,217 @@
+.enrollment-loadingContainer {
+  display: flex;
+  flex: 1;
+  background-color: #f8f9fa;
+  justify-content: center;
+  align-items: center;
+}
+
+.enrollment-activityIndicator {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  animation: enrollment-spin 1s linear infinite;
+}
+
+@keyframes enrollment-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.enrollment-container {
+  flex: 1;
+  background-color: #F8F9FA;
+  padding: 16px;
+  min-height: 100vh;
+}
+
+.enrollment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.enrollment-backButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.enrollment-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.enrollment-actionBar {
+  display: flex;
+  margin-bottom: 16px;
+  gap: 10px;
+}
+
+.enrollment-searchContainer {
+  flex: 1;
+  display: flex;
+  background-color: #FFF;
+  border-radius: 10px;
+  padding: 0 15px;
+  border: 1px solid #DFE6E9;
+  align-items: center;
+}
+
+.enrollment-searchInput {
+  flex: 1;
+  color: #2c3e50;
+  font-size: 14px;
+  margin-left: 8px;
+  border: none;
+  outline: none;
+  padding: 10px 0;
+}
+
+.enrollment-addButton {
+  display: flex;
+  background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+  border-radius: 10px;
+  padding: 0 12px;
+  align-items: center;
+  justify-content: center;
+  min-width: 80px;
+  border: none;
+  cursor: pointer;
+  color: white;
+}
+
+.enrollment-addButtonText {
+  color: #FFF;
+  font-size: 14px;
+  font-weight: 600;
+  margin-left: 6px;
+}
+
+.enrollment-cardContainer {
+  flex: 1;
+  padding: 8px;
+  overflow-y: auto;
+}
+
+.enrollment-card {
+  background: linear-gradient(135deg, #9AAADB 0%, #6C5CE7 100%);
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 12px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  color: white;
+}
+
+.enrollment-cardHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.enrollment-cardName {
+  font-size: 16px;
+  font-weight: 600;
+  flex: 1;
+  min-width: 120px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.enrollment-cardActions {
+  padding-top: 10px;
+  display: flex;
+  justify-content: center;
+}
+
+.enrollment-cardButton {
+  display: flex;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 6px 12px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.enrollment-cardButton:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.enrollment-deleteButton {
+  background-color: rgba(255, 235, 238, 0.3);
+}
+
+.enrollment-cardButtonText {
+  font-size: 14px;
+  color: white;
+  margin-left: 6px;
+  font-weight: 500;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+}
+
+.enrollment-deleteButtonText {
+  color: #FFEBEE;
+}
+
+/* Empty State Styles */
+.enrollment-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+  background: linear-gradient(135deg, rgba(52,152,219,0.05) 0%, rgba(44,62,80,0.05) 100%);
+  border-radius: 16px;
+  margin: 20px 0;
+}
+
+.enrollment-empty-icon {
+  margin-bottom: 20px;
+  opacity: 0.7;
+}
+
+.enrollment-empty-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-bottom: 12px;
+}
+
+.enrollment-empty-description {
+  font-size: 16px;
+  color: #7f8c8d;
+  margin-bottom: 24px;
+  max-width: 400px;
+  line-height: 1.5;
+}
+
+.enrollment-empty-action-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 15px rgba(52,152,219,0.3);
+}
+
+.enrollment-empty-action-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(52,152,219,0.4);
+}

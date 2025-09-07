@@ -16,6 +16,7 @@ import EnrollmentManagement from './views/admin/EnrollmentManagement';
 import EnrollmentFormModal from './views/admin/utils/EnrollmentFormModal';
 import CourseFormModal from './views/admin/utils/CourseFormModal';
 import TeacherFormModal from './views/admin/utils/TeacherFormModal';
+import PendingRequests from './views/admin/utils/PendingRequests';
 import Classes from './views/student/Classes';
 import Grades from './views/student/Grades';
 import Calendar from './views/student/Calendar';
@@ -60,6 +61,7 @@ function Layout() {
         <Route path="/enrollmentformmodal" element={<EnrollmentFormModal />} />
         <Route path="/courseformmodal" element={<CourseFormModal />} />
         <Route path="/teacherformmodal" element={<TeacherFormModal />} />
+        <Route path="/pendingrequests" element={<PendingRequests />} />
         <Route path="/classes" element={<Classes />} />
         <Route path="/grades" element={<Grades />} />
         <Route path="/calendar" element={<Calendar />} />

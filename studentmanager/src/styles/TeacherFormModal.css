@@ -1,0 +1,178 @@
+.teacher-form-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.teacher-form-modal-container {
+  width: 90%;
+  max-width: 500px;
+  background-color: #FFF;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  z-index: 2001;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.teacher-form-modal-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.teacher-form-input-group {
+  margin-bottom: 16px;
+}
+
+.teacher-form-label {
+  font-size: 14px;
+  color: #2c3e50;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.teacher-form-input {
+  width: 100%;
+  background-color: #F8F9FA;
+  border: 1px solid #DFE6E9;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 16px;
+  color: #2c3e50;
+  box-sizing: border-box;
+}
+
+.teacher-form-input:focus {
+  outline: none;
+  border-color: #3498db;
+}
+
+.teacher-form-input-error {
+  border-color: #e74c3c;
+}
+
+.teacher-form-error-text {
+  color: #e74c3c;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.teacher-form-status-container {
+  display: flex;
+  margin-top: 8px;
+}
+
+.teacher-form-status-button {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #DFE6E9;
+  background: none;
+  cursor: pointer;
+  text-align: center;
+}
+
+.teacher-form-status-button:first-child {
+  border-radius: 4px 0 0 4px;
+}
+
+.teacher-form-status-button:last-child {
+  border-radius: 0 4px 4px 0;
+}
+
+.teacher-form-status-button-text {
+  font-size: 14px;
+  color: #7f8c8d;
+  font-weight: 500;
+}
+
+.teacher-form-active-status-button {
+  background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+  border-color: #3498db;
+}
+
+.teacher-form-active-status-button-text {
+  color: #FFF;
+}
+
+.teacher-form-inactive-status-button {
+  background: #e74c3c;
+  border-color: #e74c3c;
+}
+
+.teacher-form-inactive-status-button-text {
+  color: #FFF;
+}
+
+.teacher-form-button-container {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  gap: 10px;
+}
+
+.teacher-form-cancel-button {
+  flex: 1;
+  padding: 14px;
+  border: 1px solid #DFE6E9;
+  border-radius: 10px;
+  background: none;
+  cursor: pointer;
+}
+
+.teacher-form-cancel-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.teacher-form-cancel-button-text {
+  font-size: 16px;
+  color: #7f8c8d;
+  font-weight: 600;
+}
+
+.teacher-form-submit-button {
+  flex: 1;
+  padding: 14px;
+  background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  color: white;
+}
+
+.teacher-form-submit-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.teacher-form-submit-button-text {
+  font-size: 16px;
+  color: #FFF;
+  font-weight: 600;
+}
+
+.teacher-form-activity-indicator {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #FFF;
+  border-radius: 50%;
+  animation: teacher-form-spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes teacher-form-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

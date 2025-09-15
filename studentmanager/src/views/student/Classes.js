@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Card, Button, Badge, Spinner, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../../services/axiosInstance";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -29,7 +29,7 @@ const Classes = () => {
   const fetchMyClasses = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('/students/specific-class');
+      const res = await axiosInstance.get('/students/specific-class');
       setMyClasses(res.data);
       setEnrolledIds(res.data.map(cls => cls.id));
       toast.success('Your classes loaded successfully');
@@ -44,7 +44,7 @@ const Classes = () => {
   const fetchAllClasses = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('/class');
+      const res = await axiosInstance.get('/class');
       setAllClasses(res.data);
       toast.success('All classes loaded successfully');
     } catch (err) {
@@ -62,7 +62,7 @@ const Classes = () => {
     }
 
     try {
-      await axios.post(`/enrollment`, {
+      await axiosInstance.post(`/enrollment`, {
         student_id: studentId,
         class_id: classId
       });

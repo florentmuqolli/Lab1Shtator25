@@ -8,6 +8,7 @@ const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/authRoutes');
 const studentRoutes = require('./routes/studentRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const classRoutes = require('./routes/classRoutes');
 
 const app = express();
 
@@ -41,6 +42,7 @@ mysqlPool.getConnection()
 app.use('/api/auth', authRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/class', classRoutes);
 
 
 app.use((err, req, res, next) => {

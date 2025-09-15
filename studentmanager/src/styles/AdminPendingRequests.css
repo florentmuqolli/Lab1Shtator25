@@ -231,3 +231,137 @@
   font-size: 16px;
   color: #bdc3c7;
 }
+.admin-requests-confirmation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 3000;
+  padding: 20px;
+}
+
+.admin-requests-confirmation-modal {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 450px;
+  width: 100%;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  animation: admin-requests-modal-appear 0.3s ease-out;
+}
+
+@keyframes admin-requests-modal-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.admin-requests-confirmation-header {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.admin-requests-confirmation-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.admin-requests-confirmation-body {
+  margin-bottom: 24px;
+}
+
+.admin-requests-confirmation-message {
+  font-size: 16px;
+  color: #7f8c8d;
+  line-height: 1.5;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.admin-requests-confirmation-details {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 16px;
+}
+
+.admin-requests-confirmation-detail {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.admin-requests-confirmation-detail:last-child {
+  margin-bottom: 0;
+}
+
+.admin-requests-confirmation-label {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 14px;
+}
+
+.admin-requests-confirmation-value {
+  color: #7f8c8d;
+  font-size: 14px;
+}
+
+.admin-requests-confirmation-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.admin-requests-confirmation-cancel,
+.admin-requests-confirmation-confirm {
+  padding: 12px 24px;
+  border-radius: 8px;
+  border: none;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 100px;
+}
+
+.admin-requests-confirmation-cancel {
+  background: #ecf0f1;
+  color: #7f8c8d;
+}
+
+.admin-requests-confirmation-cancel:hover {
+  background: #dfe6e9;
+}
+
+.admin-requests-confirmation-confirm {
+  color: white;
+}
+
+.admin-requests-confirmation-approve {
+  background: linear-gradient(135deg, #00B894 0%, #00a382 100%);
+}
+
+.admin-requests-confirmation-approve:hover {
+  background: linear-gradient(135deg, #00a382 0%, #008f70 100%);
+}
+
+.admin-requests-confirmation-deny {
+  background: linear-gradient(135deg, #D63031 0%, #c02929 100%);
+}
+
+.admin-requests-confirmation-deny:hover {
+  background: linear-gradient(135deg, #c02929 0%, #a82424 100%);
+}

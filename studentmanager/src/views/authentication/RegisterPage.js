@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Form, Button, Modal, Spinner, Card } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import api from '../../services/api';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -39,7 +39,7 @@ const Register = () => {
 
     setLoading(true);
     try {
-      await axios.post('/auth/request-register', form);
+      await api.post('/auth/request-register', form);
       toast.success("Applied Successfully");
       setShowApprovalModal(true);
       startCountdown();

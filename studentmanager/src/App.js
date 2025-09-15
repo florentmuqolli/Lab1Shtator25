@@ -61,7 +61,7 @@ function Layout() {
         <Route path="/enrollmentformmodal" element={<EnrollmentFormModal />} />
         <Route path="/courseformmodal" element={<CourseFormModal />} />
         <Route path="/teacherformmodal" element={<TeacherFormModal />} />
-        <Route path="/pendingrequests" element={<PendingRequests />} />
+        <Route path="/pending-requests" element={<PendingRequests />} />
         <Route path="/classes" element={<Classes />} />
         <Route path="/grades" element={<Grades />} />
         <Route path="/calendar" element={<Calendar />} />

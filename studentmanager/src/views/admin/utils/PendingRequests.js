@@ -11,6 +11,9 @@ const AdminPendingRequests = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('pending');
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [pendingAction, setPendingAction] = useState(null);
+  const [selectedRequest, setSelectedRequest] = useState(null);
 
   useEffect(() => {
     fetchRequests();
@@ -48,10 +51,25 @@ const AdminPendingRequests = () => {
     }
   };
 
-  const confirmAction = (action, id) => {
-    if (window.confirm(`Are you sure you want to ${action} this request?`)) {
-      action === 'approve' ? handleApprove(id) : handleDeny(id);
+  const showConfirmationModal = (action, request) => {
+    setPendingAction(action);
+    setSelectedRequest(request);
+    setShowConfirmation(true);
+  };
+
+  const handleConfirm = () => {
+    if (pendingAction === 'approve') {
+      handleApprove(selectedRequest._id);
+    } else {
+      handleDeny(selectedRequest._id);
     }
+    setShowConfirmation(false);
+  };
+
+  const handleCancel = () => {
+    setShowConfirmation(false);
+    setPendingAction(null);
+    setSelectedRequest(null);
   };
 
   const filtered = filter === 'all'
@@ -144,14 +162,14 @@ const AdminPendingRequests = () => {
                     <div className="admin-requests-actions">
                       <button
                         className="admin-requests-button admin-requests-approveButton"
-                        onClick={() => confirmAction('approve', item._id)}
+                        onClick={() => showConfirmationModal('approve', item)}
                       >
                         <span className="admin-requests-buttonIcon">✓</span>
                         <span className="admin-requests-buttonText">Approve</span>
                       </button>
                       <button
                         className="admin-requests-button admin-requests-denyButton"
-                        onClick={() => confirmAction('deny', item._id)}
+                        onClick={() => showConfirmationModal('deny', item)}
                       >
                         <span className="admin-requests-buttonIcon">✗</span>
                         <span className="admin-requests-buttonText">Deny</span>
@@ -168,6 +186,54 @@ const AdminPendingRequests = () => {
             </div>
           )}
         </div>
+
+        {showConfirmation && selectedRequest && (
+          <div className="admin-requests-confirmation-overlay">
+            <div className="admin-requests-confirmation-modal">
+              <div className="admin-requests-confirmation-header">
+                <h3 className="admin-requests-confirmation-title">
+                  {pendingAction === 'approve' ? 'Approve Request' : 'Deny Request'}
+                </h3>
+              </div>
+              <div className="admin-requests-confirmation-body">
+                <p className="admin-requests-confirmation-message">
+                  Are you sure you want to {pendingAction} this request from{' '}
+                  <strong>{selectedRequest.name}</strong> ({selectedRequest.email})?
+                </p>
+                <div className="admin-requests-confirmation-details">
+                  <div className="admin-requests-confirmation-detail">
+                    <span className="admin-requests-confirmation-label">Role:</span>
+                    <span className="admin-requests-confirmation-value">{selectedRequest.role}</span>
+                  </div>
+                  <div className="admin-requests-confirmation-detail">
+                    <span className="admin-requests-confirmation-label">Requested:</span>
+                    <span className="admin-requests-confirmation-value">
+                      {new Date(selectedRequest.createdAt).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="admin-requests-confirmation-actions">
+                <button
+                  className="admin-requests-confirmation-cancel"
+                  onClick={handleCancel}
+                >
+                  Cancel
+                </button>
+                <button
+                  className={`admin-requests-confirmation-confirm ${
+                    pendingAction === 'approve' 
+                      ? 'admin-requests-confirmation-approve' 
+                      : 'admin-requests-confirmation-deny'
+                  }`}
+                  onClick={handleConfirm}
+                >
+                  {pendingAction === 'approve' ? 'Approve' : 'Deny'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </ScreenWrapper>
   );

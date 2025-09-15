@@ -53,7 +53,7 @@ exports.approveRequest = async (req, res) => {
     pending.status = 'approved';
     await pending.save();
 
-    await ActivityLog.create(req.user.name, 'approved a user registration request', '✅');
+    await ActivityLog.create(req.user?.name, 'approved a user registration request', '✅');
 
     res.status(200).json({ message: 'Request approved and user created' });
   } catch (err) {

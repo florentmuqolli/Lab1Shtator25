@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Card, Button, Form, Spinner, Badge, Modal, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../../services/axiosInstance";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -26,13 +26,12 @@ const TeacherGrades = () => {
     try {
       setLoading(true);
       const [classesRes, gradesRes] = await Promise.all([
-        axios.get("/class/specific-class"),
-        axios.get("/grades/my"),
+        axiosInstance.get("/class/specific-class"),
+        axiosInstance.get("/grades/my"),
       ]);
       setClasses(classesRes.data);
       setGrades(gradesRes.data);
       setFilteredGrades(gradesRes.data);
-      toast.success('Grades data loaded successfully');
     } catch (error) {
       console.error("Error fetching data:", error);
       toast.error("Failed to load grades data");
@@ -43,7 +42,7 @@ const TeacherGrades = () => {
 
   const fetchStudentsForClass = async (classId) => {
     try {
-      const res = await axios.get(`/enrollment/${classId}/students`);
+      const res = await axiosInstance.get(`/enrollment/${classId}/students`);
       setStudents(res.data);
     } catch (error) {
       console.error("Error fetching students:", error);
@@ -75,7 +74,7 @@ const TeacherGrades = () => {
     }
 
     try {
-      await axios.post("/grades", {
+      await axiosInstance.post("/grades", {
         class_id: selectedClassId,
         student_id: selectedStudentId,
         grade: parseFloat(gradeValue),

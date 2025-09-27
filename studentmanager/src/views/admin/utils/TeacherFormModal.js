@@ -58,10 +58,10 @@ const TeacherFormModal = ({ visible, onClose, teacher, refreshTeachers }) => {
     setLoading(true);
     try {
       if (teacher) {
-        await axiosInstance.put(`/teachers/${teacher.id}`, formData);
+        await axiosInstance.put(`/teacher/${teacher.id}`, formData);
         toast.success("Teacher Updated");
       } else {
-        await axiosInstance.post('/teachers', formData);
+        await axiosInstance.post('/teacher', formData);
         toast.success("Teacher Created");
       }
       refreshTeachers();

@@ -18,7 +18,7 @@ const TeacherManagement = () => {
   const fetchTeachers = async () => {
     setLoading(true);
     try {
-      const res = await axiosInstance.get('/teachers');
+      const res = await axiosInstance.get('/teacher');
       setLoading(false);
       setTeachers(res.data);
     } catch (err) {
@@ -40,7 +40,7 @@ const TeacherManagement = () => {
   const deleteTeacher = async (id) => {
     setLoading(true);
     try {
-      await axiosInstance.delete(`/teachers/${id}`);
+      await axiosInstance.delete(`/teacher/${id}`);
       toast.success("Teacher Deleted");
       setTimeout(() => {
         setLoading(false);

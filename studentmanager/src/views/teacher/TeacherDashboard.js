@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Card, Button, Badge, Spinner, Nav, ProgressBar, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../../services/axiosInstance";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import "../../styles/TeacherDashboard.css"; 
 
 const TeacherDashboard = () => {
   const navigate = useNavigate();
@@ -36,9 +37,9 @@ const TeacherDashboard = () => {
     setLoading(true);
     try {
       const [teacherRes, attendanceRes, classRes] = await Promise.all([
-        axios.get('/teachers/teacher-stats'),
-        axios.get('/attendance/summary/teacher'),
-        axios.get('/class/specific-class'),
+        axiosInstance.get('/teacher/teacher-stats'),
+        axiosInstance.get('/attendance/summary/teacher'),
+        axiosInstance.get('/class/specific-class'),
       ]);
 
       const teacherData = teacherRes.data;
@@ -56,13 +57,17 @@ const TeacherDashboard = () => {
         newCourses: teacherData.courses.new,
         averageAttendance
       });
-
       
-      setUpcomingClasses([
-        { id: 1, title: 'Mathematics 101', description: 'Algebra and Calculus', time: '10:00 AM', day: 'Monday', room: 'Room 203' },
-        { id: 2, title: 'Advanced Physics', description: 'Quantum Mechanics', time: '2:00 PM', day: 'Tuesday', room: 'Room 105' },
-        { id: 3, title: 'Computer Science', description: 'Data Structures', time: '9:00 AM', day: 'Wednesday', room: 'Room 301' }
-      ]);
+      setUpcomingClasses(
+        specificClass.map(c => ({
+          id: c.id,
+          title: c.title,
+          description: c.description,
+          time: c.schedule,
+          day: c.day,
+          room: c.room
+        }))
+      );
 
       setLastUpdated(new Date());
       toast.success('Dashboard updated successfully');
@@ -74,14 +79,41 @@ const TeacherDashboard = () => {
     }
   };
 
+  const fetchEnrolledStudents = async (teacherId) => {
+    try {
+      const classRes = await axiosInstance.get(`/class/teacher/${teacherId}`);
+      const classes = classRes.data;
+
+      const studentPromises = classes.map((c) =>
+        axiosInstance.get(`/enrollments/${c.id}/students`)
+      );
+      const studentResponses = await Promise.all(studentPromises);
+      const allStudents = [];
+      const studentMap = new Map();
+
+      studentResponses.forEach((res) => {
+        res.data.forEach((s) => {
+          if (!studentMap.has(s.id)) {
+            studentMap.set(s.id, { id: s.id, name: s.name || `Student ${s.id}` });
+          }
+        });
+      });
+
+      setRecentStudents(Array.from(studentMap.values()));
+    } catch (err) {
+      console.error('Failed to fetch enrolled students:', err);
+      toast.error('Unable to load enrolled students');
+    }
+  };
+
+
   useEffect(() => {
+    const teacherId = 1; 
     fetchStats();
-    setRecentStudents([
-      { id: '1', name: 'Alex Johnson', course: 'Mathematics 101', progress: 85 },
-      { id: '2', name: 'Maria Garcia', course: 'Advanced Physics', progress: 92 },
-      { id: '3', name: 'John Smith', course: 'Computer Science', progress: 78 }
-    ]);
+    fetchEnrolledStudents(teacherId);
   }, []);
+
+
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
@@ -92,59 +124,63 @@ const TeacherDashboard = () => {
 
   if (loading && !stats) {
     return (
-      <div className="d-flex justify-content-center align-items-center min-vh-100 bg-light">
-        <div className="text-center">
-          <Spinner animation="border" variant="primary" style={{ width: '3rem', height: '3rem' }} />
-          <p className="text-muted mt-3">Loading your dashboard...</p>
+      <div className="teacher-dashboard-loading">
+        <div className="teacher-dashboard-spinner-container">
+          <Spinner animation="border" variant="primary" className="teacher-dashboard-spinner" />
+          <p className="teacher-dashboard-loading-text">Loading your dashboard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-light min-vh-100">
-      {}
-      <div className="bg-white shadow-sm py-3">
+    <div className="teacher-dashboard-container">
+      <div className="teacher-dashboard-header">
         <Container>
           <Row className="align-items-center">
             <Col>
-              <h4 className="fw-bold text-dark mb-0">Teacher Dashboard</h4>
+              <h4 className="teacher-dashboard-title">Teacher Dashboard</h4>
             </Col>
             <Col xs="auto">
-              <div className="d-flex align-items-center">
+              <div className="teacher-dashboard-header-actions">
                 <Button
                   variant="outline-primary"
                   size="sm"
                   onClick={fetchStats}
                   disabled={loading}
-                  className="me-3"
+                  className="teacher-dashboard-refresh-btn"
                 >
                   <i className={`fas ${loading ? 'fa-spinner fa-spin' : 'fa-sync-alt'} me-1`}></i>
                   Refresh
                 </Button>
-                <div className="position-relative">
+                <div className="teacher-dashboard-profile-container">
                   <Button
                     variant="outline-primary"
                     size="sm"
                     onClick={() => setShowProfileMenu(!showProfileMenu)}
+                    className="teacher-dashboard-profile-btn"
                   >
                     <i className="fas fa-user me-1"></i>
                     Professor
                   </Button>
                   
                   {showProfileMenu && (
-                    <Card className="position-absolute end-0 mt-2 shadow" style={{ zIndex: 1000, minWidth: '200px' }}>
-                      <Card.Body className="p-3">
-                        <div className="text-center mb-3">
-                          <div className="bg-primary rounded-circle d-inline-flex align-items-center justify-content-center mb-2" 
-                               style={{ width: '60px', height: '60px' }}>
-                            <i className="fas fa-user-graduate fa-lg text-white"></i>
+                    <Card className="teacher-dashboard-profile-menu">
+                      <Card.Body className="teacher-dashboard-profile-menu-body">
+                        <div className="teacher-dashboard-profile-info">
+                          <div className="teacher-dashboard-profile-avatar">
+                            <i className="fas fa-user-graduate"></i>
                           </div>
-                          <h6 className="fw-bold mb-0">Professor</h6>
-                          <small className="text-muted">Faculty Member</small>
+                          <h6 className="teacher-dashboard-profile-name">Professor</h6>
+                          <small className="teacher-dashboard-profile-role">Faculty Member</small>
                         </div>
-                        <hr />
-                        <Button variant="outline-danger" size="sm" className="w-100" onClick={handleLogout}>
+                        <hr className="teacher-dashboard-profile-divider" />
+                        <Button 
+                          variant="outline-danger" 
+                          size="sm" 
+                          className="teacher-dashboard-logout-btn"
+                          onClick={handleLogout}
+                        >
                           <i className="fas fa-sign-out-alt me-1"></i>
                           Logout
                         </Button>
@@ -158,16 +194,15 @@ const TeacherDashboard = () => {
         </Container>
       </div>
 
-      <Container className="py-4">
-        {}
+      <Container className="teacher-dashboard-content">
         <Row className="mb-4">
           <Col>
-            <Card className="border-0 shadow-sm">
-              <Card.Body className="p-4">
+            <Card className="teacher-dashboard-welcome-card">
+              <Card.Body className="teacher-dashboard-welcome-body">
                 <Row className="align-items-center">
                   <Col md={8}>
-                    <h3 className="fw-bold text-dark mb-2">Welcome, Professor!</h3>
-                    <p className="text-muted mb-3">
+                    <h3 className="teacher-dashboard-welcome-title">Welcome, Professor!</h3>
+                    <p className="teacher-dashboard-welcome-text">
                       Here's your teaching overview for {new Date().toLocaleDateString('en-US', { 
                         weekday: 'long', 
                         year: 'numeric',
@@ -176,14 +211,14 @@ const TeacherDashboard = () => {
                       })}
                     </p>
                     {elapsedTime && (
-                      <small className="text-muted">
+                      <small className="teacher-dashboard-update-time">
                         <i className="fas fa-clock me-1"></i>Last updated {elapsedTime}
                       </small>
                     )}
                   </Col>
                   <Col md={4} className="text-md-end">
-                    <div className="bg-primary bg-opacity-10 p-3 rounded d-inline-block">
-                      <i className="fas fa-chalkboard-teacher fa-2x text-primary"></i>
+                    <div className="teacher-dashboard-welcome-icon">
+                      <i className="fas fa-chalkboard-teacher"></i>
                     </div>
                   </Col>
                 </Row>
@@ -191,74 +226,73 @@ const TeacherDashboard = () => {
             </Card>
           </Col>
         </Row>
-
-        {}
         <Row className="mb-4">
           <Col md={4} className="mb-3">
-            <Card className="border-0 shadow-sm h-100">
-              <Card.Body className="p-4">
-                <div className="d-flex align-items-center mb-3">
-                  <div className="bg-success bg-opacity-10 p-3 rounded me-3">
-                    <i className="fas fa-user-graduate fa-2x text-success"></i>
+            <Card className="teacher-dashboard-stat-card teacher-dashboard-stat-students">
+              <Card.Body className="teacher-dashboard-stat-body">
+                <div className="teacher-dashboard-stat-content">
+                  <div className="teacher-dashboard-stat-icon">
+                    <i className="fas fa-user-graduate"></i>
                   </div>
                   <div>
-                    <h3 className="fw-bold text-dark mb-0">{stats?.totalStudents || 0}</h3>
-                    <small className="text-muted">Total Students</small>
+                    <h3 className="teacher-dashboard-stat-value">{stats?.totalStudents || 0}</h3>
+                    <small className="teacher-dashboard-stat-label">Total Students</small>
                   </div>
                 </div>
-                <Badge bg="success" className="px-3 py-2">
+                <Badge className="teacher-dashboard-stat-badge teacher-dashboard-stat-badge-students">
                   +{stats?.newStudents || 0} New
                 </Badge>
               </Card.Body>
             </Card>
           </Col>
           <Col md={4} className="mb-3">
-            <Card className="border-0 shadow-sm h-100">
-              <Card.Body className="p-4">
-                <div className="d-flex align-items-center mb-3">
-                  <div className="bg-primary bg-opacity-10 p-3 rounded me-3">
-                    <i className="fas fa-book fa-2x text-primary"></i>
+            <Card className="teacher-dashboard-stat-card teacher-dashboard-stat-courses">
+              <Card.Body className="teacher-dashboard-stat-body">
+                <div className="teacher-dashboard-stat-content">
+                  <div className="teacher-dashboard-stat-icon">
+                    <i className="fas fa-book"></i>
                   </div>
                   <div>
-                    <h3 className="fw-bold text-dark mb-0">{stats?.totalCourses || 0}</h3>
-                    <small className="text-muted">Active Courses</small>
+                    <h3 className="teacher-dashboard-stat-value">{stats?.totalCourses || 0}</h3>
+                    <small className="teacher-dashboard-stat-label">Active Courses</small>
                   </div>
                 </div>
-                <Badge bg="primary" className="px-3 py-2">
+                <Badge className="teacher-dashboard-stat-badge teacher-dashboard-stat-badge-courses">
                   +{stats?.newCourses || 0} New
                 </Badge>
               </Card.Body>
             </Card>
           </Col>
           <Col md={4} className="mb-3">
-            <Card className="border-0 shadow-sm h-100">
-              <Card.Body className="p-4">
-                <div className="d-flex align-items-center mb-3">
-                  <div className="bg-info bg-opacity-10 p-3 rounded me-3">
-                    <i className="fas fa-chart-line fa-2x text-info"></i>
+            <Card className="teacher-dashboard-stat-card teacher-dashboard-stat-attendance">
+              <Card.Body className="teacher-dashboard-stat-body">
+                <div className="teacher-dashboard-stat-content">
+                  <div className="teacher-dashboard-stat-icon">
+                    <i className="fas fa-chart-line"></i>
                   </div>
                   <div>
-                    <h3 className="fw-bold text-dark mb-0">{stats?.averageAttendance || 0}%</h3>
-                    <small className="text-muted">Avg Attendance</small>
+                    <h3 className="teacher-dashboard-stat-value">{stats?.averageAttendance || 0}%</h3>
+                    <small className="teacher-dashboard-stat-label">Avg Attendance</small>
                   </div>
                 </div>
-                <ProgressBar now={stats?.averageAttendance || 0} variant="info" className="mt-2" style={{ height: '8px' }} />
+                <ProgressBar 
+                  now={stats?.averageAttendance || 0} 
+                  className="teacher-dashboard-attendance-progress" 
+                />
               </Card.Body>
             </Card>
           </Col>
         </Row>
-
-        {}
         <Row className="mb-4">
           <Col>
-            <Card className="border-0 shadow-sm">
-              <Card.Body className="p-3">
-                <Nav variant="pills" className="justify-content-center">
+            <Card className="teacher-dashboard-tabs-card">
+              <Card.Body className="teacher-dashboard-tabs-body">
+                <Nav className="teacher-dashboard-tabs">
                   <Nav.Item>
                     <Nav.Link 
                       active={activeTab === 'overview'} 
                       onClick={() => setActiveTab('overview')}
-                      className="mx-2"
+                      className="teacher-dashboard-tab"
                     >
                       <i className="fas fa-home me-2"></i>Overview
                     </Nav.Link>
@@ -267,7 +301,7 @@ const TeacherDashboard = () => {
                     <Nav.Link 
                       active={activeTab === 'manage'} 
                       onClick={() => setActiveTab('manage')}
-                      className="mx-2"
+                      className="teacher-dashboard-tab"
                     >
                       <i className="fas fa-cog me-2"></i>Manage
                     </Nav.Link>
@@ -276,7 +310,7 @@ const TeacherDashboard = () => {
                     <Nav.Link 
                       active={activeTab === 'students'} 
                       onClick={() => setActiveTab('students')}
-                      className="mx-2"
+                      className="teacher-dashboard-tab"
                     >
                       <i className="fas fa-users me-2"></i>Students
                     </Nav.Link>
@@ -286,33 +320,31 @@ const TeacherDashboard = () => {
             </Card>
           </Col>
         </Row>
-
-        {}
         {activeTab === 'overview' && (
           <Row>
             <Col lg={8}>
-              <Card className="border-0 shadow-sm mb-4">
-                <Card.Body className="p-4">
-                  <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h5 className="fw-bold text-dark mb-0">Upcoming Classes</h5>
-                    <Button variant="outline-primary" size="sm">View All</Button>
+              <Card className="teacher-dashboard-section-card">
+                <Card.Body className="teacher-dashboard-section-body">
+                  <div className="teacher-dashboard-section-header">
+                    <h5 className="teacher-dashboard-section-title">Upcoming Classes</h5>
+                    <Button variant="outline-primary" size="sm" className="teacher-dashboard-view-all-btn">View All</Button>
                   </div>
                   
                   {upcomingClasses.map((classItem) => (
-                    <Card key={classItem.id} className="mb-3 border-0 bg-light">
-                      <Card.Body className="p-3">
-                        <div className="d-flex justify-content-between align-items-start">
-                          <div className="flex-grow-1">
-                            <h6 className="fw-bold text-dark mb-1">{classItem.title}</h6>
-                            <p className="text-muted small mb-2">{classItem.description}</p>
-                            <div className="d-flex align-items-center text-muted small">
+                    <Card key={classItem.id} className="teacher-dashboard-class-card">
+                      <Card.Body className="teacher-dashboard-class-body">
+                        <div className="teacher-dashboard-class-content">
+                          <div className="teacher-dashboard-class-info">
+                            <h6 className="teacher-dashboard-class-title">{classItem.title}</h6>
+                            <p className="teacher-dashboard-class-description">{classItem.description}</p>
+                            <div className="teacher-dashboard-class-details">
                               <i className="fas fa-clock me-2"></i>
                               <span className="me-3">{classItem.time} • {classItem.day}</span>
                               <i className="fas fa-map-marker-alt me-2"></i>
                               <span>{classItem.room}</span>
                             </div>
                           </div>
-                          <Button variant="outline-primary" size="sm">
+                          <Button variant="outline-primary" size="sm" className="teacher-dashboard-class-btn">
                             View
                           </Button>
                         </div>
@@ -323,20 +355,20 @@ const TeacherDashboard = () => {
               </Card>
             </Col>
             <Col lg={4}>
-              <Card className="border-0 shadow-sm">
-                <Card.Body className="p-4">
-                  <h5 className="fw-bold text-dark mb-4">Quick Actions</h5>
-                  <div className="d-grid gap-2">
-                    <Button variant="outline-primary" className="text-start py-3">
+              <Card className="teacher-dashboard-section-card">
+                <Card.Body className="teacher-dashboard-section-body">
+                  <h5 className="teacher-dashboard-section-title">Quick Actions</h5>
+                  <div className="teacher-dashboard-actions">
+                    <Button variant="outline-primary" className="teacher-dashboard-action-btn">
                       <i className="fas fa-book me-2"></i>My Courses
                     </Button>
-                    <Button variant="outline-primary" className="text-start py-3">
+                    <Button variant="outline-primary" className="teacher-dashboard-action-btn">
                       <i className="fas fa-tasks me-2"></i>Assignments
                     </Button>
-                    <Button variant="outline-primary" className="text-start py-3">
+                    <Button variant="outline-primary" className="teacher-dashboard-action-btn">
                       <i className="fas fa-chart-line me-2"></i>Grades
                     </Button>
-                    <Button variant="outline-primary" className="text-start py-3">
+                    <Button variant="outline-primary" className="teacher-dashboard-action-btn">
                       <i className="fas fa-users me-2"></i>Students
                     </Button>
                   </div>
@@ -349,31 +381,30 @@ const TeacherDashboard = () => {
         {activeTab === 'students' && (
           <Row>
             <Col>
-              <Card className="border-0 shadow-sm">
-                <Card.Body className="p-4">
-                  <div className="d-flex justify-content-between align-items-center mb-4">
-                    <h5 className="fw-bold text-dark mb-0">Recent Students</h5>
-                    <Button variant="outline-primary" size="sm">View All</Button>
+              <Card className="teacher-dashboard-section-card">
+                <Card.Body className="teacher-dashboard-section-body">
+                  <div className="teacher-dashboard-section-header">
+                    <h5 className="teacher-dashboard-section-title">Recent Students</h5>
+                    <Button variant="outline-primary" size="sm" className="teacher-dashboard-view-all-btn">View All</Button>
                   </div>
                   
                   {recentStudents.map((student) => (
-                    <Card key={student.id} className="mb-3 border-0">
-                      <Card.Body className="p-3">
+                    <Card key={student.id} className="teacher-dashboard-student-card">
+                      <Card.Body className="teacher-dashboard-student-body">
                         <Row className="align-items-center">
                           <Col xs="auto">
-                            <div className="bg-primary rounded-circle d-flex align-items-center justify-content-center" 
-                                 style={{ width: '50px', height: '50px' }}>
-                              <span className="text-white fw-bold">
+                            <div className="teacher-dashboard-student-avatar">
+                              <span>
                                 {student.name.split(' ').map(n => n[0]).join('')}
                               </span>
                             </div>
                           </Col>
                           <Col>
-                            <h6 className="fw-bold text-dark mb-1">{student.name}</h6>
-                            <p className="text-muted small mb-0">{student.course}</p>
+                            <h6 className="teacher-dashboard-student-name">{student.name}</h6>
+                            <p className="teacher-dashboard-student-course">{student.course}</p>
                           </Col>
                           <Col xs="auto">
-                            <Badge bg="primary">{student.progress}% Progress</Badge>
+                            <Badge className="teacher-dashboard-student-progress">{student.progress}% Progress</Badge>
                           </Col>
                         </Row>
                       </Card.Body>

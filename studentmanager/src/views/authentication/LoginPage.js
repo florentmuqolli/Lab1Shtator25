@@ -52,7 +52,6 @@ const Login = () => {
       toast.success("Logged in successfully");
 
       setTimeout(() => {
-        setLoading(false);
         if (response.data.user.role === "admin") {
           navigate("/admin-dashboard");
         } else if (response.data.user.role === "teacher") {
@@ -60,6 +59,7 @@ const Login = () => {
         } else {
           navigate("/student-dashboard");
         }
+        setLoading(false);
       }, 1000);
     } catch (error) {
       console.error(error);

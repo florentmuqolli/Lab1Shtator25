@@ -18,7 +18,7 @@ const Classes = () => {
 
   const fetchStudentId = async () => {
     try {
-      const res = await axios.get('/auth/me');
+      const res = await axiosInstance.get('/auth/me');
       setStudentId(res.data.studentId);  
     } catch (err) {
       console.error('Error fetching student info:', err);

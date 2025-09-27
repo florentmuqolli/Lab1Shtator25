@@ -49,7 +49,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/class', classRoutes);
-app.use('/api/enrollment', enrollmentRoutes);
+app.use('/api/enrollments', enrollmentRoutes);
 app.use('/api/grades', gradeRoutes);
 app.use('/api/assignments', assignmentRoutes);
 app.use('/api/attendance', attendanceRoutes);

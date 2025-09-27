@@ -3,7 +3,9 @@ const router = express.Router();
 const controller = require('../controllers/classController');
 const { authenticateToken, authorizeRoles } = require('../middleware/auth');
 
-router.get('/specific-class', authenticateToken, authorizeRoles('teacher','admin'),controller.getClassByTeacher);
+router.get('/specific-class', authenticateToken, authorizeRoles('teacher','admin'), controller.getClassByTeacher);
+router.get('/by-student', authenticateToken, authorizeRoles('student', 'admin'), controller.getClassByStudent);
+
 router.get('/', controller.getAllClasses);
 router.get('/:id', controller.getClassById);
 router.post('/', authenticateToken, authorizeRoles('admin'), controller.createClass);

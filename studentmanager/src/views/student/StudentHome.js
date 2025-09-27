@@ -1,47 +1,80 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Row, Col, Card, Button, Badge, ProgressBar } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '../../services/axiosInstance';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import '../../styles/StudentHome.css';
 
-const DashboardScreen = () => {
+const StudentDashboard = () => {
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [elapsedTime, setElapsedTime] = useState('');
   const [stats, setStats] = useState({
-    upcomingClasses: 2,
-    pendingAssignments: 3,
-    averageGrade: 87.5
+    upcomingClasses: 0,
+    pendingAssignments: 0,
+    averageGrade: 0,
+    completedCourses: 0,
+    attendanceRate: 0,
   });
+  const [todaysClasses, setTodaysClasses] = useState([]);
+  const [upcomingAssignments, setUpcomingAssignments] = useState([]);
 
   useEffect(() => {
     if (!lastUpdated) return;
-
     const interval = setInterval(() => {
       const secondsAgo = Math.floor((Date.now() - lastUpdated.getTime()) / 1000);
-      if (secondsAgo < 60) {
-        setElapsedTime(`${secondsAgo}s ago`);
-      } else {
-        const minutes = Math.floor(secondsAgo / 60);
-        setElapsedTime(`${minutes}m ago`);
-      }
+      setElapsedTime(secondsAgo < 60 ? `${secondsAgo}s ago` : `${Math.floor(secondsAgo / 60)}m ago`);
     }, 1000);
-
     return () => clearInterval(interval);
   }, [lastUpdated]);
 
   const fetchData = async () => {
     try {
       setLoading(true);
-      const res = await axios.get("/auth/me");
-      setName(res.data.name);
+      const userRes = await axiosInstance.get('/auth/me');
+      setName(userRes.data.name);
+      const classesRes = await axiosInstance.get('/class/by-student', {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+      const classes = classesRes.data;
+      const today = new Date().toLocaleString('en-US', { weekday: 'long' });
+      const todayClasses = classes.filter(c => c.day === today);
+      setTodaysClasses(todayClasses);
+      const assignmentsRes = await axiosInstance.get('/assignments', {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+      });
+      const assignments = assignmentsRes.data;
+      const assignmentsWithProgress = await Promise.all(assignments.map(async (a) => {
+        try {
+          const subRes = await axiosInstance.get(`/assignments/${a.id}/activity`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+          });
+          const total = subRes.data.total_submissions || 0;
+          const completed = subRes.data.submissions.filter(s => s.student_name === name).length;
+          const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
+          return { ...a, progress };
+        } catch (err) {
+          console.error('Error fetching assignment progress:', err);
+          return { ...a, progress: 0 };
+        }
+      }));
+
+      const pendingAssignments = assignmentsWithProgress.filter(a => new Date(a.due_date) >= new Date());
+      setUpcomingAssignments(pendingAssignments);
+
+      setStats({
+        upcomingClasses: todayClasses.length,
+        pendingAssignments: pendingAssignments.length,
+        averageGrade: 0, 
+        completedCourses: 0,
+        attendanceRate: 0,
+      });
+
       setLastUpdated(new Date());
-      toast.success('Dashboard updated successfully');
     } catch (error) {
-      console.error('Failed to load data:', error);
+      console.error('Failed to load student dashboard:', error);
       toast.error('Failed to update dashboard');
     } finally {
       setLoading(false);
@@ -49,7 +82,7 @@ const DashboardScreen = () => {
   };
 
   const handleNavigate = () => {
-    navigate('/studentprofile');
+    navigate('/student-profile');
   };
 
   useEffect(() => {
@@ -58,246 +91,141 @@ const DashboardScreen = () => {
 
   if (loading && !name) {
     return (
-      <div className="d-flex justify-content-center align-items-center min-vh-100 bg-light">
-        <div className="text-center">
-          <div className="spinner-border text-primary mb-3" style={{ width: '3rem', height: '3rem' }} role="status">
-            <span className="visually-hidden">Loading...</span>
-          </div>
-          <p className="text-muted">Loading your dashboard...</p>
-        </div>
+      <div className="dashboard-loading-container">
+        <div className="dashboard-loading-spinner"></div>
+        <p className="dashboard-loading-text">Loading your dashboard...</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-light min-vh-100">
-      <div className="bg-white shadow-sm py-3">
-        <Container>
-          <Row className="align-items-center">
-            <Col>
-              <h4 className="fw-bold text-dark mb-0">Dashboard</h4>
-            </Col>
-            <Col xs="auto">
-              <div className="d-flex align-items-center">
-                <Button
-                  variant="outline-primary"
-                  size="sm"
-                  onClick={fetchData}
-                  disabled={loading}
-                  className="me-3"
-                >
-                  <i className={`fas ${loading ? 'fa-spinner fa-spin' : 'fa-sync-alt'} me-1`}></i>
-                  Refresh
-                </Button>
-                <div 
-                  onClick={handleNavigate}
-                  className="rounded-circle d-flex align-items-center justify-content-center bg-primary text-white"
-                  style={{ width: '40px', height: '40px', fontSize: '16px', fontWeight: '600' }}
-                >
-                  {name ? name.charAt(0).toUpperCase() : 'U'}
+    <div className="dashboard-container">
+      <header className="dashboard-header">
+        <div className="dashboard-header-content">
+          <div className="dashboard-header-left">
+            <h1 className="dashboard-title">Dashboard</h1>
+            <p className="dashboard-subtitle">Welcome to your learning portal</p>
+          </div>
+          <div className="dashboard-header-right">
+            <button
+              className="dashboard-refresh-btn"
+              onClick={fetchData}
+              disabled={loading}
+            >
+              <span className={`dashboard-refresh-icon ${loading ? 'loading' : ''}`}>
+                ↻
+              </span>
+              {loading ? 'Updating...' : 'Refresh'}
+            </button>
+            <div 
+              className="dashboard-profile-avatar"
+              onClick={handleNavigate}
+              title="View Profile"
+            >
+              <span className="dashboard-avatar-text">
+                {name ? name.charAt(0).toUpperCase() : 'U'}
+              </span>
+            </div>
+          </div>
+        </div>
+      </header>
+      <main className="dashboard-main">
+        <div className="dashboard-welcome-card">
+          <div className="welcome-card-content">
+            <div className="welcome-text">
+              <h2>Welcome back, {name}! 👋</h2>
+              <p>Here's your academic overview for today. Stay on track with your learning journey.</p>
+              {elapsedTime && (
+                <div className="last-updated">
+                  <span className="update-indicator"></span>
+                  Last updated {elapsedTime}
                 </div>
-              </div>
-            </Col>
-          </Row>
-        </Container>
-      </div>
-
-      <Container className="py-4">
-        <Row className="mb-4">
-          <Col>
-            <Card className="border-0 shadow-sm">
-              <Card.Body className="p-4">
-                <Row className="align-items-center">
-                  <Col md={8}>
-                    <h3 className="fw-bold text-dark mb-2">Welcome back, {name}!</h3>
-                    <p className="text-muted mb-3">Here's what's happening with your classes today.</p>
-                    {elapsedTime && (
-                      <small className="text-muted">
-                        <i className="fas fa-clock me-1"></i>Last updated {elapsedTime}
-                      </small>
-                    )}
-                  </Col>
-                  <Col md={4} className="text-md-end">
-                    <div className="d-inline-block bg-primary bg-opacity-10 p-3 rounded">
-                      <i className="fas fa-graduation-cap fa-2x text-primary"></i>
+              )}
+            </div>
+            <div className="welcome-graphic">
+              <div className="graphic-icon">🎓</div>
+            </div>
+          </div>
+        </div>
+        <div className="dashboard-content-grid">
+          <div className="content-card classes-card">
+            <div className="card-header">
+              <h3>Today's Classes</h3>
+              <button className="view-all-btn">View All →</button>
+            </div>
+            <div className="classes-list">
+              {todaysClasses.length === 0 && <p>No classes today.</p>}
+              {todaysClasses.map((c) => (
+                <div key={c.id} className="class-item">
+                  <div className="class-time">{c.schedule}</div>
+                  <div className="class-details">
+                    <h4>{c.title}</h4>
+                    <p>{c.room} • {c.teacher_name}</p>
+                  </div>
+                  <div className="class-subject">{c.title.charAt(0)}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="content-card assignments-card">
+            <div className="card-header">
+              <h3>My Assignments</h3>
+              <button className="view-all-btn">View All →</button>
+            </div>
+            <div className="assignments-list">
+              {upcomingAssignments.length === 0 && <p>No upcoming assignments.</p>}
+              {upcomingAssignments.map((a) => (
+                <div key={a.id} className="assignment-item">
+                  <div className="assignment-icon">{a.title.charAt(0)}</div>
+                  <div className="assignment-details">
+                    <h4>{a.title}</h4>
+                    <p>Due {new Date(a.due_date).toLocaleDateString()} • {a.points || 0} pts</p>
+                    <div className="progress-container">
+                      <div className="progress-bar">
+                        <div className="progress-fill" style={{ width: `${a.progress}%` }}></div>
+                      </div>
+                      <span>{a.progress}%</span>
                     </div>
-                  </Col>
-                </Row>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-
-        <Row className="mb-4">
-          <Col md={4} className="mb-3">
-            <Card className="border-0 shadow-sm h-100">
-              <Card.Body className="p-4">
-                <div className="d-flex align-items-center">
-                  <div className="bg-primary bg-opacity-10 p-3 rounded me-3">
-                    <i className="fas fa-calendar-alt text-primary"></i>
-                  </div>
-                  <div>
-                    <h5 className="fw-bold text-dark mb-0">{stats.upcomingClasses}</h5>
-                    <small className="text-muted">Upcoming Classes</small>
                   </div>
                 </div>
-              </Card.Body>
-            </Card>
-          </Col>
-          <Col md={4} className="mb-3">
-            <Card className="border-0 shadow-sm h-100">
-              <Card.Body className="p-4">
-                <div className="d-flex align-items-center">
-                  <div className="bg-warning bg-opacity-10 p-3 rounded me-3">
-                    <i className="fas fa-tasks text-warning"></i>
-                  </div>
-                  <div>
-                    <h5 className="fw-bold text-dark mb-0">{stats.pendingAssignments}</h5>
-                    <small className="text-muted">Pending Assignments</small>
-                  </div>
-                </div>
-              </Card.Body>
-            </Card>
-          </Col>
-          <Col md={4} className="mb-3">
-            <Card className="border-0 shadow-sm h-100">
-              <Card.Body className="p-4">
-                <div className="d-flex align-items-center">
-                  <div className="bg-success bg-opacity-10 p-3 rounded me-3">
-                    <i className="fas fa-chart-line text-success"></i>
-                  </div>
-                  <div>
-                    <h5 className="fw-bold text-dark mb-0">{stats.averageGrade}%</h5>
-                    <small className="text-muted">Average Grade</small>
-                  </div>
-                </div>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-
-        <Row>
-          <Col lg={8} className="mb-4">
-            <Card className="border-0 shadow-sm h-100">
-              <Card.Body>
-                <div className="d-flex justify-content-between align-items-center mb-4">
-                  <h5 className="fw-bold text-dark mb-0">Today's Classes</h5>
-                  <Button variant="outline-primary" size="sm">View All</Button>
-                </div>
-                
-                <div className="row g-3">
-                  <div className="col-md-6">
-                    <Card className="border-0 bg-primary text-white">
-                      <Card.Body className="p-3">
-                        <div className="d-flex justify-content-between align-items-start mb-2">
-                          <Badge bg="light" text="dark" className="fw-normal">10:00 - 11:30</Badge>
-                          <i className="fas fa-calculator"></i>
-                        </div>
-                        <h6 className="fw-bold mb-1">Mathematics</h6>
-                        <small className="opacity-75">Room 203 • Prof. Johnson</small>
-                      </Card.Body>
-                    </Card>
-                  </div>
-                  <div className="col-md-6">
-                    <Card className="border-0 bg-success text-white">
-                      <Card.Body className="p-3">
-                        <div className="d-flex justify-content-between align-items-start mb-2">
-                          <Badge bg="light" text="dark" className="fw-normal">13:00 - 14:30</Badge>
-                          <i className="fas fa-atom"></i>
-                        </div>
-                        <h6 className="fw-bold mb-1">Physics</h6>
-                        <small className="opacity-75">Room 105 • Dr. Smith</small>
-                      </Card.Body>
-                    </Card>
-                  </div>
-                </div>
-              </Card.Body>
-            </Card>
-          </Col>
-
-          <Col lg={4} className="mb-4">
-            <Card className="border-0 shadow-sm h-100">
-              <Card.Body>
-                <div className="d-flex justify-content-between align-items-center mb-4">
-                  <h5 className="fw-bold text-dark mb-0">Upcoming Assignments</h5>
-                  <Button variant="outline-primary" size="sm">View All</Button>
-                </div>
-                
-                <div className="d-flex align-items-center mb-3">
-                  <div className="bg-info bg-opacity-10 p-2 rounded me-3">
-                    <i className="fas fa-calculator text-info"></i>
-                  </div>
-                  <div className="flex-grow-1">
-                    <h6 className="fw-bold text-dark mb-1">Math Homework #2</h6>
-                    <small className="text-muted">Due Tomorrow • 10 pts</small>
-                    <ProgressBar now={0} variant="warning" className="mt-1" style={{ height: '4px' }} />
-                  </div>
-                </div>
-
-                <div className="d-flex align-items-center mb-3">
-                  <div className="bg-primary bg-opacity-10 p-2 rounded me-3">
-                    <i className="fas fa-book text-primary"></i>
-                  </div>
-                  <div className="flex-grow-1">
-                    <h6 className="fw-bold text-dark mb-1">Literature Essay</h6>
-                    <small className="text-muted">Due in 3 days • 15 pts</small>
-                    <ProgressBar now={30} variant="primary" className="mt-1" style={{ height: '4px' }} />
-                  </div>
-                </div>
-
-                <div className="d-flex align-items-center">
-                  <div className="bg-success bg-opacity-10 p-2 rounded me-3">
-                    <i className="fas fa-flask text-success"></i>
-                  </div>
-                  <div className="flex-grow-1">
-                    <h6 className="fw-bold text-dark mb-1">Lab Report</h6>
-                    <small className="text-muted">Due in 5 days • 20 pts</small>
-                    <ProgressBar now={60} variant="success" className="mt-1" style={{ height: '4px' }} />
-                  </div>
-                </div>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-
-        <Row>
-          <Col>
-            <Card className="border-0 shadow-sm">
-              <Card.Body className="p-4">
-                <h5 className="fw-bold text-dark mb-4">Quick Actions</h5>
-                <Row className="g-3">
-                  <Col md={3} sm={6}>
-                    <Button variant="outline-primary" className="w-100 py-3 d-flex flex-column align-items-center">
-                      <i className="fas fa-calendar-alt fa-2x mb-2"></i>
-                      <span>Schedule</span>
-                    </Button>
-                  </Col>
-                  <Col md={3} sm={6}>
-                    <Button variant="outline-primary" className="w-100 py-3 d-flex flex-column align-items-center">
-                      <i className="fas fa-tasks fa-2x mb-2"></i>
-                      <span>Assignments</span>
-                    </Button>
-                  </Col>
-                  <Col md={3} sm={6}>
-                    <Button variant="outline-primary" className="w-100 py-3 d-flex flex-column align-items-center">
-                      <i className="fas fa-chart-line fa-2x mb-2"></i>
-                      <span>Grades</span>
-                    </Button>
-                  </Col>
-                  <Col md={3} sm={6}>
-                    <Button variant="outline-primary" className="w-100 py-3 d-flex flex-column align-items-center">
-                      <i className="fas fa-book fa-2x mb-2"></i>
-                      <span>Resources</span>
-                    </Button>
-                  </Col>
-                </Row>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-      </Container>
+              ))}
+            </div>
+          </div>
+        </div>
+        <div className="content-card quick-actions-card">
+          <div className="card-header">
+            <h3>Quick Actions</h3>
+          </div>
+          <div className="actions-grid">
+            <button className="action-btn" onClick={() => navigate('/coming-soon')}>
+              <div className="action-icon">📅</div>
+              <span>Schedule</span>
+            </button>
+            <button className="action-btn" onClick={() => navigate('/student-assignments')}>
+              <div className="action-icon">📝</div>
+              <span>Assignments</span>
+            </button>
+            <button className="action-btn" onClick={() => navigate('/student-grades')}>
+              <div className="action-icon">📊</div>
+              <span>Grades</span>
+            </button>
+            <button className="action-btn" onClick={() => navigate('/coming-soon')}>
+              <div className="action-icon">📚</div>
+              <span>Resources</span>
+            </button>
+            <button className="action-btn" onClick={() => navigate('/student-classes')}>
+              <div className="action-icon">👥</div>
+              <span>Classes</span>
+            </button>
+            <button className="action-btn" onClick={() => navigate('/student-profile')}>
+              <div className="action-icon">⚙️</div>
+              <span>Settings</span>
+            </button>
+          </div>
+        </div>
+      </main>
     </div>
   );
 };
 
-export default DashboardScreen;
+export default StudentDashboard;

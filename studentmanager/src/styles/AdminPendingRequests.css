@@ -4,6 +4,7 @@
   background-color: #f8f9fa;
   justify-content: center;
   align-items: center;
+  min-height: 60vh;
 }
 
 .admin-requests-activityIndicator {
@@ -22,57 +23,82 @@
 
 .admin-requests-container {
   flex: 1;
-  background-color: #F8F9FA;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e7eb 100%);
   min-height: 100vh;
+  padding: 0 0 40px 0;
 }
 
 .admin-requests-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px;
-  margin-bottom: 20px;
+  padding: 20px 24px;
+  background: white;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  margin-bottom: 24px;
 }
 
 .admin-requests-backButton {
-  background: none;
-  border: none;
+  background: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
   cursor: pointer;
-  padding: 8px;
+  padding: 10px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-requests-backButton:hover {
+  background: #e9ecef;
+  transform: translateX(-2px);
 }
 
 .admin-requests-title {
-  font-size: 20px;
-  font-weight: bold;
+  font-size: 22px;
+  font-weight: 700;
   color: #2c3e50;
+  letter-spacing: -0.5px;
 }
 
 .admin-requests-filterContainer {
   display: flex;
-  justify-content: space-between;
-  padding: 16px;
+  justify-content: center;
+  padding: 16px 24px;
   background-color: #FFF;
-  border-bottom: 1px solid #F1F3F5;
-  gap: 8px;
+  border-bottom: 1px solid #e9ecef;
+  gap: 12px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  border-radius: 0 0 12px 12px;
 }
 
 .admin-requests-filterButton {
-  padding: 8px 16px;
-  border-radius: 20px;
-  border: none;
-  background: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  background: #f8f9fa;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.admin-requests-filterButton:hover {
+  background: #e9ecef;
+  transform: translateY(-2px);
 }
 
 .admin-requests-activeFilter {
   background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%);
+  border: none;
+  box-shadow: 0 4px 8px rgba(52, 152, 219, 0.3);
 }
 
 .admin-requests-filterText {
   font-size: 14px;
   font-weight: 500;
-  color: #7f8c8d;
+  color: #6c757d;
 }
 
 .admin-requests-activeFilterText {
@@ -80,126 +106,175 @@
 }
 
 .admin-requests-listContent {
-  padding: 16px;
+  padding: 0 24px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .admin-requests-card {
   background-color: #FFF;
-  border-radius: 16px;
-  padding: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.07);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid #e9ecef;
+  position: relative;
+  overflow: hidden;
+}
+
+.admin-requests-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(to bottom, #3498db, #2c3e50);
+  opacity: 0;
+  transition: opacity 0.2s ease;
 }
 
 .admin-requests-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.admin-requests-card:hover::before {
+  opacity: 1;
 }
 
 .admin-requests-cardHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #f1f3f5;
 }
 
 .admin-requests-userInfo {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
 .admin-requests-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 20px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
   color: white;
-  font-size: 16px;
+  font-size: 18px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  position: relative;
+}
+
+.admin-requests-avatar::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: white;
+  border: 2px solid white;
 }
 
 .admin-requests-avatarIcon {
-  font-size: 16px;
+  font-size: 20px;
 }
 
 .admin-requests-name {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
   color: #2c3e50;
+  margin-bottom: 4px;
 }
 
 .admin-requests-role {
-  font-size: 12px;
-  color: #7f8c8d;
-  margin-top: 2px;
+  font-size: 13px;
+  color: #6c757d;
+  text-transform: capitalize;
+  font-weight: 500;
 }
 
 .admin-requests-statusBadge {
-  padding: 4px 12px;
-  border-radius: 12px;
+  padding: 6px 14px;
+  border-radius: 20px;
   font-size: 12px;
   font-weight: 600;
   text-transform: capitalize;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .admin-requests-cardBody {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 .admin-requests-infoRow {
   display: flex;
   align-items: center;
-  margin-bottom: 8px;
-  gap: 8px;
+  margin-bottom: 12px;
+  gap: 12px;
 }
 
 .admin-requests-icon {
   font-size: 16px;
+  width: 20px;
+  text-align: center;
 }
 
 .admin-requests-email {
-  font-size: 14px;
-  color: #7f8c8d;
+  font-size: 15px;
+  color: #495057;
+  font-weight: 500;
 }
 
 .admin-requests-date {
-  font-size: 12px;
-  color: #7f8c8d;
+  font-size: 13px;
+  color: #6c757d;
 }
 
 .admin-requests-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #f1f3f5;
 }
 
 .admin-requests-button {
   display: flex;
   align-items: center;
-  padding: 8px 16px;
+  padding: 10px 18px;
   border-radius: 8px;
   border: none;
   cursor: pointer;
-  gap: 6px;
-  transition: opacity 0.2s ease;
+  gap: 8px;
+  transition: all 0.2s ease;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 .admin-requests-button:hover {
-  opacity: 0.9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
 
 .admin-requests-approveButton {
-  background-color: #00B894;
+  background: linear-gradient(135deg, #00B894 0%, #00a382 100%);
   color: white;
 }
 
 .admin-requests-denyButton {
-  background-color: #D63031;
+  background: linear-gradient(135deg, #D63031 0%, #c02929 100%);
   color: white;
 }
 
@@ -209,7 +284,6 @@
 
 .admin-requests-buttonText {
   font-size: 14px;
-  font-weight: 600;
 }
 
 .admin-requests-emptyState {
@@ -217,20 +291,27 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 40px;
+  padding: 60px 20px;
   text-align: center;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  margin: 20px 0;
 }
 
 .admin-requests-emptyIcon {
-  font-size: 48px;
-  margin-bottom: 16px;
-  opacity: 0.5;
+  font-size: 56px;
+  margin-bottom: 20px;
+  opacity: 0.7;
 }
 
 .admin-requests-emptyText {
-  font-size: 16px;
-  color: #bdc3c7;
+  font-size: 18px;
+  color: #6c757d;
+  font-weight: 500;
 }
+
 .admin-requests-confirmation-overlay {
   position: fixed;
   top: 0;
@@ -243,16 +324,18 @@
   align-items: center;
   z-index: 3000;
   padding: 20px;
+  backdrop-filter: blur(4px);
 }
 
 .admin-requests-confirmation-modal {
   background: white;
   border-radius: 16px;
-  padding: 24px;
-  max-width: 450px;
+  padding: 28px;
+  max-width: 480px;
   width: 100%;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
   animation: admin-requests-modal-appear 0.3s ease-out;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 @keyframes admin-requests-modal-appear {
@@ -267,7 +350,7 @@
 }
 
 .admin-requests-confirmation-header {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
   text-align: center;
 }
 
@@ -279,29 +362,30 @@
 }
 
 .admin-requests-confirmation-body {
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 
 .admin-requests-confirmation-message {
   font-size: 16px;
-  color: #7f8c8d;
-  line-height: 1.5;
-  margin-bottom: 20px;
+  color: #495057;
+  line-height: 1.6;
+  margin-bottom: 24px;
   text-align: center;
 }
 
 .admin-requests-confirmation-details {
   background: #f8f9fa;
   border-radius: 12px;
-  padding: 16px;
-  margin-top: 16px;
+  padding: 20px;
+  margin-top: 20px;
+  border: 1px solid #e9ecef;
 }
 
 .admin-requests-confirmation-detail {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .admin-requests-confirmation-detail:last-child {
@@ -315,39 +399,50 @@
 }
 
 .admin-requests-confirmation-value {
-  color: #7f8c8d;
+  color: #495057;
   font-size: 14px;
+  font-weight: 500;
 }
 
 .admin-requests-confirmation-actions {
   display: flex;
-  gap: 12px;
+  gap: 16px;
   justify-content: center;
 }
 
 .admin-requests-confirmation-cancel,
 .admin-requests-confirmation-confirm {
-  padding: 12px 24px;
+  padding: 12px 28px;
   border-radius: 8px;
   border: none;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  min-width: 100px;
+  min-width: 120px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 .admin-requests-confirmation-cancel {
-  background: #ecf0f1;
-  color: #7f8c8d;
+  background: #f8f9fa;
+  color: #6c757d;
+  border: 1px solid #e9ecef;
 }
 
 .admin-requests-confirmation-cancel:hover {
-  background: #dfe6e9;
+  background: #e9ecef;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
 .admin-requests-confirmation-confirm {
   color: white;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.admin-requests-confirmation-confirm:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
 }
 
 .admin-requests-confirmation-approve {
@@ -364,4 +459,39 @@
 
 .admin-requests-confirmation-deny:hover {
   background: linear-gradient(135deg, #c02929 0%, #a82424 100%);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .admin-requests-header {
+    padding: 16px;
+  }
+  
+  .admin-requests-filterContainer {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .admin-requests-listContent {
+    padding: 0 16px;
+  }
+  
+  .admin-requests-cardHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .admin-requests-actions {
+    flex-direction: column;
+  }
+  
+  .admin-requests-confirmation-actions {
+    flex-direction: column;
+  }
+  
+  .admin-requests-confirmation-cancel,
+  .admin-requests-confirmation-confirm {
+    width: 100%;
+  }
 }

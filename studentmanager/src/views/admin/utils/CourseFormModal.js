@@ -15,8 +15,24 @@ const CourseFormModal = ({ visible, onClose, course, refreshCourses }) => {
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [teachers, setTeachers] = useState([]);
+
 
   useEffect(() => {
+    const fetchTeachers = async () => {
+      try {
+        const res = await axiosInstance.get('/teacher'); 
+        setTeachers(res.data);
+      } catch (err) {
+        console.error("Failed to fetch teachers:", err);
+        toast.error("Unable to load teachers");
+      }
+    };
+
+    if (visible) {
+      fetchTeachers();
+    }
+
     if (course) {
       setFormData({
         title: course.title || '',
@@ -105,14 +121,19 @@ const CourseFormModal = ({ visible, onClose, course, refreshCourses }) => {
         </div>
 
         <div className="course-form-input-group">
-          <div className="course-form-label">Professor ID*</div>
-          <input
-            className={`course-form-input ${errors.teacher_id ? 'course-form-input-error' : ''}`}
-            placeholder="Teacher ID"
-            type="number"
+          <div className="course-form-label">Professor*</div>
+          <select
+            className={`course-form-select ${errors.teacher_id ? 'course-form-input-error' : ''}`}
             value={formData.teacher_id}
             onChange={(e) => setFormData({...formData, teacher_id: e.target.value})}
-          />
+          >
+            <option value="">Select Professor</option>
+            {teachers.map((teacher) => (
+              <option key={teacher.id} value={teacher.id}>
+                {teacher.name}
+              </option>
+            ))}
+          </select>
           {errors.teacher_id && <div className="course-form-error-text">{errors.teacher_id}</div>}
         </div>
 

@@ -50,11 +50,11 @@ app.use('/api/students', studentRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/class', classRoutes);
 app.use('/api/enrollment', enrollmentRoutes);
-app.use('/api/grade', gradeRoutes);
-app.use('/api/grade', assignmentRoutes);
-app.use('/api/grade', attendanceRoutes);
-app.use('/api/grade', submissionRoutes);
-app.use('/api/grade', teacherRoutes);
+app.use('/api/grades', gradeRoutes);
+app.use('/api/assignments', assignmentRoutes);
+app.use('/api/attendance', attendanceRoutes);
+app.use('/api/submissions', submissionRoutes);
+app.use('/api/teacher', teacherRoutes);
 
 
 app.use((err, req, res, next) => {

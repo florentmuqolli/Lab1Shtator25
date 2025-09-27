@@ -36,14 +36,25 @@ function Layout() {
 
   const hideHeaderRoutes = [
     "/admin-dashboard",
+    "/student-dashboard",
+    "/teacher-dashboard",
+    "/studentmanagement",
+    "/login",
+    "/register",
+    "/forgot-password"
+  ];
+  const hideFooterRoutes = [
+    "/admin-dashboard",
+    "/student-dashboard",
+    "/teacher-dashboard",
     "/studentmanagement",
     "/login",
     "/register",
     "/forgot-password"
   ];
 
-
   const shouldHideHeader = hideHeaderRoutes.includes(location.pathname);
+  const shouldHideFooter = hideFooterRoutes.includes(location.pathname);
 
   return (
     <>
@@ -55,9 +66,9 @@ function Layout() {
         <Route path="/student-dashboard" element={<StudentDashboard />} />
         <Route path="/admin-dashboard" element={<AdminDashboard />} />
         <Route path="/studentmanagement" element={<StudentManagement />} />
-        <Route path="/coursemanagement" element={<CourseManagement />} />
+        <Route path="/course-management" element={<CourseManagement />} />
         <Route path="/teachermanagement" element={<TeacherManagement />} />
-        <Route path="/enrollmentmanagement" element={<EnrollmentManagement />} />
+        <Route path="/enrollment-management" element={<EnrollmentManagement />} />
         <Route path="/enrollmentformmodal" element={<EnrollmentFormModal />} />
         <Route path="/courseformmodal" element={<CourseFormModal />} />
         <Route path="/teacherformmodal" element={<TeacherFormModal />} />
@@ -67,16 +78,16 @@ function Layout() {
         <Route path="/calendar" element={<Calendar />} />
         <Route path="/assignments" element={<Assignments />} />
         <Route path="/teacher-dashboard" element={<TeacherDashboard />} />
-        <Route path="/myclasses" element={<MyClasses />} />
-        <Route path="/assignmentsteacher" element={<AssignmentsTeacher />} />
-        <Route path="/gradesteacher" element={<GradesTeacher />} />
-        <Route path="/assignmentform" element={<AssignmentForm />} />
-        <Route path="/assignmentstats" element={<AssignmentStats />} />
+        <Route path="/teacher-classes" element={<MyClasses />} />
+        <Route path="/teacher-assignments" element={<AssignmentsTeacher />} />
+        <Route path="/teacher-grades" element={<GradesTeacher />} />
+        <Route path="/teacher-assignmentform" element={<AssignmentForm />} />
+        <Route path="/teacher-assignmentstats" element={<AssignmentStats />} />
         <Route path="/studentprofile" element={<ProfilePage />} />
         <Route path="/coming-soon" element={<ComingSoonScreen />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
       </Routes>
-      <Footer />
+      {!shouldHideFooter && <Footer />}
     </>
   );
 }

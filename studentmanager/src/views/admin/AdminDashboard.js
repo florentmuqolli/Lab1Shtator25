@@ -57,9 +57,11 @@ const AdminDashboard = () => {
 
   const fetchStats = async () => {
     try {
+      setLoading(true);
       const res = await axiosInstance.get('/admin/dashboard-stats');
       const data = res.data;
-      setStats([
+      setTimeout(() => {
+        setStats([
         {
           id: '1',
           title: 'Total Students',
@@ -83,7 +85,9 @@ const AdminDashboard = () => {
           alert: data.professors.new === 0,
         },
       ]);
+      setLoading(false);
       setLastUpdated(new Date());
+      }, 500);
     } catch (err) {
       console.error('Failed to load dashboard stats:', err);
     }

@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Container, Row, Col, Card, Button, Form, Spinner, Badge, Modal, Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axiosInstance from "../../services/axiosInstance";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import "../../styles/TeacherGrades.css";
 
 const TeacherGrades = () => {
   const navigate = useNavigate();
@@ -17,33 +18,47 @@ const TeacherGrades = () => {
   const [selectedClassId, setSelectedClassId] = useState("");
   const [selectedStudentId, setSelectedStudentId] = useState("");
   const [gradeValue, setGradeValue] = useState("");
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const [elapsedTime, setElapsedTime] = useState("");
 
   useEffect(() => {
     fetchData();
   }, []);
 
+
+  useEffect(() => {
+    if (!lastUpdated) return;
+    const interval = setInterval(() => {
+      const secondsAgo = Math.floor((Date.now() - lastUpdated.getTime()) / 1000);
+      setElapsedTime(secondsAgo < 60 ? `${secondsAgo}s ago` : `${Math.floor(secondsAgo / 60)}m ago`);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [lastUpdated]);
+
   const fetchData = async () => {
     try {
       setLoading(true);
       const [classesRes, gradesRes] = await Promise.all([
-        axios.get("/class/specific-class"),
-        axios.get("/grades/my"),
+        axiosInstance.get("/class/specific-class"),
+        axiosInstance.get("/grades/my"),
       ]);
-      setClasses(classesRes.data);
-      setGrades(gradesRes.data);
-      setFilteredGrades(gradesRes.data);
-      toast.success('Grades data loaded successfully');
+      setTimeout(() => {
+        setClasses(classesRes.data);
+        setGrades(gradesRes.data);
+        setFilteredGrades(gradesRes.data);
+        setLastUpdated(new Date());
+        setLoading(false);
+      }, 1000);
     } catch (error) {
+      setLoading(false);
       console.error("Error fetching data:", error);
       toast.error("Failed to load grades data");
-    } finally {
-      setLoading(false);
-    }
+    } 
   };
 
   const fetchStudentsForClass = async (classId) => {
     try {
-      const res = await axios.get(`/enrollment/${classId}/students`);
+      const res = await axiosInstance.get(`/enrollments/${classId}/students`);
       setStudents(res.data);
     } catch (error) {
       console.error("Error fetching students:", error);
@@ -75,7 +90,7 @@ const TeacherGrades = () => {
     }
 
     try {
-      await axios.post("/grades", {
+      await axiosInstance.post("/grades", {
         class_id: selectedClassId,
         student_id: selectedStudentId,
         grade: parseFloat(gradeValue),
@@ -102,157 +117,229 @@ const TeacherGrades = () => {
     return 'danger';
   };
 
+  const getGradeVariant = (grade) => {
+    if (!grade) return 'secondary';
+    const numericGrade = parseFloat(grade);
+    if (numericGrade >= 90) return 'success';
+    if (numericGrade >= 80) return 'primary';
+    if (numericGrade >= 70) return 'warning';
+    return 'danger';
+  };
+
   if (loading && grades.length === 0) {
     return (
-      <div className="d-flex justify-content-center align-items-center min-vh-100 bg-light">
-        <div className="text-center">
-          <Spinner animation="border" variant="primary" style={{ width: '3rem', height: '3rem' }} />
-          <p className="text-muted mt-3">Loading grades data...</p>
-        </div>
+      <div className="dashboard-loading-container">
+        <div className="dashboard-loading-spinner"></div>
+        <p className="dashboard-loading-text">Loading grades data...</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-light min-vh-100">
-      {}
-      <div className="bg-white shadow-sm py-3">
-        <Container>
-          <Row className="align-items-center">
-            <Col>
-              <h4 className="fw-bold text-dark mb-0">Grade Management</h4>
-            </Col>
-            <Col xs="auto">
-              <Button 
-                variant="outline-primary" 
-                size="sm"
+    <div className="dashboard-container">
+      <header className="dashboard-header">
+        <div className="dashboard-header-content">
+          <div className="dashboard-header-left">
+            <div className="header-navigation">
+              <button
+                className="back-button"
                 onClick={() => navigate(-1)}
-                className="me-2"
+                title="Go back"
               >
-                <i className="fas fa-arrow-left me-1"></i> Back
-              </Button>
-              <Button 
-                variant="primary" 
-                size="sm"
-                onClick={() => setShowAddModal(true)}
-              >
-                <i className="fas fa-plus me-1"></i> Add Grade
-              </Button>
-            </Col>
-          </Row>
-        </Container>
-      </div>
+                <span className="back-icon">←</span>
+                Back
+              </button>
+            </div>
+            <div className="header-titles">
+              <h1 className="dashboard-title">Grade Management</h1>
+              <p className="dashboard-subtitle">Track and manage student grades across all classes</p>
+            </div>
+          </div>
+          <div className="dashboard-header-right">
+            <button
+              className="dashboard-refresh-btn"
+              onClick={fetchData}
+              disabled={loading}
+            >
+              <span className={`dashboard-refresh-icon ${loading ? 'loading' : ''}`}>
+                ↻
+              </span>
+              {loading ? 'Updating...' : 'Refresh'}
+            </button>
+            <button
+              className="dashboard-create-btn"
+              onClick={() => setShowAddModal(true)}
+            >
+              <span className="create-icon">+</span>
+              Add Grade
+            </button>
+          </div>
+        </div>
+      </header>
 
-      <Container className="py-4">
-        {}
-        <Row className="mb-4">
-          <Col lg={8} className="mb-3">
-            <Card className="border-0 shadow-sm">
-              <Card.Body className="p-3">
-                <div className="d-flex align-items-center">
-                  <i className="fas fa-search text-muted me-2"></i>
-                  <Form.Control
-                    type="text"
-                    placeholder="Search by student ID, class ID, or grade..."
-                    value={searchQuery}
-                    onChange={(e) => handleSearch(e.target.value)}
-                    className="border-0"
-                  />
+      <main className="dashboard-main">
+        {/* Welcome Card */}
+        <div className="dashboard-welcome-card">
+          <div className="welcome-card-content">
+            <div className="welcome-text">
+              <h2>Grade Management 📊</h2>
+              <p>Monitor student performance, record grades, and track academic progress across all your classes.</p>
+              {elapsedTime && (
+                <div className="last-updated">
+                  <span className="update-indicator"></span>
+                  Last updated {elapsedTime}
                 </div>
-              </Card.Body>
-            </Card>
-          </Col>
-          <Col lg={4} className="mb-3">
-            <Card className="border-0 shadow-sm text-center h-100">
-              <Card.Body className="p-3">
-                <h3 className="fw-bold text-primary mb-1">{grades.length}</h3>
-                <small className="text-muted">Total Grades</small>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
+              )}
+            </div>
+            <div className="welcome-graphic">
+              <div className="graphic-icon">🎓</div>
+            </div>
+          </div>
+        </div>
 
-        {}
-        {filteredGrades.length > 0 ? (
-          <Row>
-            <Col>
-              <Card className="border-0 shadow-sm">
-                <Card.Body className="p-4">
-                  <h5 className="fw-bold text-dark mb-4">Grade Records</h5>
-                  <Table responsive striped>
-                    <thead>
-                      <tr>
-                        <th>Student ID</th>
-                        <th>Class ID</th>
-                        <th>Grade</th>
-                        <th>Date Graded</th>
-                        <th>Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredGrades.map((grade) => (
-                        <tr key={grade.id}>
-                          <td className="fw-semibold">{grade.student_id}</td>
-                          <td>{grade.class_id}</td>
-                          <td>
-                            <Badge bg={getGradeColor(grade.grade)} className="px-3 py-2">
-                              {grade.grade}
-                            </Badge>
-                          </td>
-                          <td>
-                            {grade.graded_at ? new Date(grade.graded_at).toLocaleDateString() : 'N/A'}
-                          </td>
-                          <td>
-                            <Badge bg="success">Recorded</Badge>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </Table>
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
-        ) : (
-          <Row>
-            <Col>
-              <Card className="border-0 shadow-sm text-center py-5">
-                <Card.Body>
-                  <i className="fas fa-graduation-cap fa-3x text-muted mb-3"></i>
-                  <h5 className="text-dark mb-2">
-                    {searchQuery ? 'No matching grades found' : 'No grades recorded yet'}
-                  </h5>
-                  <p className="text-muted mb-4">
-                    {searchQuery 
-                      ? 'Try adjusting your search terms' 
-                      : 'Add grades using the button above to get started'}
-                  </p>
-                  {searchQuery ? (
-                    <Button variant="outline-primary" onClick={() => handleSearch('')}>
-                      Clear Search
-                    </Button>
-                  ) : (
-                    <Button variant="primary" onClick={() => setShowAddModal(true)}>
-                      Add First Grade
-                    </Button>
-                  )}
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
-        )}
-      </Container>
+        {/* Search and Stats Row */}
+        <div className="dashboard-content-grid">
+          <div className="content-card search-card">
+            <div className="search-container">
+              <div className="search-icon">🔍</div>
+              <input
+                type="text"
+                placeholder="Search by student ID, class ID, or grade..."
+                value={searchQuery}
+                onChange={(e) => handleSearch(e.target.value)}
+                className="search-input"
+              />
+              {searchQuery && (
+                <button 
+                  className="search-clear-btn"
+                  onClick={() => handleSearch('')}
+                >
+                  ×
+                </button>
+              )}
+            </div>
+          </div>
+          
+          <div className="content-card stats-card">
+            <div className="stat-content">
+              <div className="stat-icon grades">📈</div>
+              <div>
+                <h3>{grades.length}</h3>
+                <p>Total Grades</p>
+              </div>
+            </div>
+          </div>
+        </div>
 
-      {}
-      <Modal show={showAddModal} onHide={() => setShowAddModal(false)} centered size="lg">
-        <Modal.Header closeButton>
-          <Modal.Title>Add New Grade</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group className="mb-3">
-              <Form.Label>Select Class</Form.Label>
-              <Form.Select
+        {/* Grades Table */}
+        <div className="content-card grades-table-card">
+          <div className="card-header">
+            <h3>
+              {searchQuery ? `Search Results (${filteredGrades.length})` : 'All Grade Records'}
+            </h3>
+            <span className="results-count">
+              Showing {filteredGrades.length} of {grades.length} grades
+            </span>
+          </div>
+
+          {filteredGrades.length > 0 ? (
+            <div className="grades-table-container">
+              <div className="table-header">
+                <div className="table-cell">Student ID</div>
+                <div className="table-cell">Class ID</div>
+                <div className="table-cell">Grade</div>
+                <div className="table-cell">Date Graded</div>
+                <div className="table-cell">Status</div>
+              </div>
+              
+              <div className="table-body">
+                {filteredGrades.map((grade) => (
+                  <div key={grade.id} className="table-row">
+                    <div className="table-cell">
+                      <div className="student-id">
+                        {grade.student_id}
+                      </div>
+                    </div>
+                    <div className="table-cell">
+                      <div className="class-id">
+                        {grade.class_id}
+                      </div>
+                    </div>
+                    <div className="table-cell">
+                      <span className={`grade-badge ${getGradeVariant(grade.grade)}`}>
+                        {grade.grade}
+                      </span>
+                    </div>
+                    <div className="table-cell">
+                      <div className="date-graded">
+                        {grade.graded_at ? new Date(grade.graded_at).toLocaleDateString() : 'N/A'}
+                      </div>
+                    </div>
+                    <div className="table-cell">
+                      <span className="status-badge recorded">
+                        Recorded
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="empty-state">
+              <div className="empty-icon">📊</div>
+              <h4>
+                {searchQuery ? 'No matching grades found' : 'No grades recorded yet'}
+              </h4>
+              <p>
+                {searchQuery 
+                  ? 'Try adjusting your search terms' 
+                  : 'Add grades using the button above to get started'}
+              </p>
+              {searchQuery ? (
+                <button 
+                  className="action-btn primary"
+                  onClick={() => handleSearch('')}
+                >
+                  Clear Search
+                </button>
+              ) : (
+                <button 
+                  className="action-btn primary"
+                  onClick={() => setShowAddModal(true)}
+                >
+                  Add First Grade
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+      </main>
+
+      {/* Enhanced Add Grade Modal */}
+      <Modal show={showAddModal} onHide={() => setShowAddModal(false)} centered className="wide-modal">
+        <div className="modal-header-gradient">
+          <div className="modal-header-content">
+            <div className="modal-title-section">
+              <div className="modal-icon">
+                ➕
+              </div>
+              <div>
+                <h3>Add New Grade</h3>
+                <p>Record a new grade for a student</p>
+              </div>
+            </div>
+            <button className="modal-close-btn" onClick={() => setShowAddModal(false)}>×</button>
+          </div>
+        </div>
+        
+        <div className="modal-body-custom">
+          <div className="form-container">
+            <div className="form-group">
+              <label className="form-label">
+                <span className="label-icon">📚</span>
+                Select Class <span className="required">*</span>
+              </label>
+              <select
                 value={selectedClassId}
                 onChange={(e) => {
                   setSelectedClassId(e.target.value);
@@ -261,6 +348,7 @@ const TeacherGrades = () => {
                     fetchStudentsForClass(e.target.value);
                   }
                 }}
+                className="form-select"
               >
                 <option value="">Choose a class...</option>
                 {classes.map((cls) => (
@@ -268,15 +356,19 @@ const TeacherGrades = () => {
                     {cls.title} (ID: {cls.id})
                   </option>
                 ))}
-              </Form.Select>
-            </Form.Group>
+              </select>
+            </div>
 
             {students.length > 0 && (
-              <Form.Group className="mb-3">
-                <Form.Label>Select Student</Form.Label>
-                <Form.Select
+              <div className="form-group">
+                <label className="form-label">
+                  <span className="label-icon">👨‍🎓</span>
+                  Select Student <span className="required">*</span>
+                </label>
+                <select
                   value={selectedStudentId}
                   onChange={(e) => setSelectedStudentId(e.target.value)}
+                  className="form-select"
                 >
                   <option value="">Choose a student...</option>
                   {students.map((student) => (
@@ -284,13 +376,16 @@ const TeacherGrades = () => {
                       Student ID: {student.id}
                     </option>
                   ))}
-                </Form.Select>
-              </Form.Group>
+                </select>
+              </div>
             )}
 
-            <Form.Group className="mb-3">
-              <Form.Label>Enter Grade</Form.Label>
-              <Form.Control
+            <div className="form-group">
+              <label className="form-label">
+                <span className="label-icon">⭐</span>
+                Enter Grade <span className="required">*</span>
+              </label>
+              <input
                 type="number"
                 placeholder="Enter grade (e.g., 85.50)"
                 value={gradeValue}
@@ -298,21 +393,31 @@ const TeacherGrades = () => {
                 min="0"
                 max="100"
                 step="0.01"
+                className="form-input"
               />
-              <Form.Text className="text-muted">
+              <div className="form-note">
+                <span className="note-icon">ℹ️</span>
                 Enter a grade between 0 and 100
-              </Form.Text>
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="outline-secondary" onClick={() => setShowAddModal(false)}>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="modal-footer-custom">
+          <button 
+            className="modal-btn secondary"
+            onClick={() => setShowAddModal(false)}
+          >
             Cancel
-          </Button>
-          <Button variant="primary" onClick={handleAddGrade}>
+          </button>
+          <button 
+            className="modal-btn primary"
+            onClick={handleAddGrade}
+          >
+            <span className="btn-icon">📝</span>
             Submit Grade
-          </Button>
-        </Modal.Footer>
+          </button>
+        </div>
       </Modal>
     </div>
   );

@@ -21,6 +21,26 @@ exports.getTotalStudentsByTeacher = async (req, res) => {
   }
 };
 
+exports.getEnrollmentsByTeacherId = async (req, res) => {
+  try {
+   const userId = req.user?.id;
+        
+    const teacher = await Teacher.getByUserId(userId);
+    if (!teacher) {
+      return res.status(404).json({ message: 'Teacher not found' });
+    }
+
+    const teacherId = teacher.id;
+
+    const [students] = await Enrollment.getEnrollmentsByTeacherId(teacherId);
+
+    res.json(students);
+  } catch (error) {
+    console.error("Error fetching enrollments by teacher:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 exports.getAllEnrollments = async (req, res) => {
   try {
     const [rows] = await Enrollment.getAll();

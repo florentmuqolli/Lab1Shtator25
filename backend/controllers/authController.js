@@ -154,29 +154,54 @@ exports.getUserProfile = async (req, res) => {
 
     const userId = req.user.id;
 
-    const studentObj = await Student.getByUserId(userId);
-    if (!studentObj) {
-      return res.status(404).json({ message: 'Student not found' });
-    }
-    const studentId = studentObj.id;
+    if (user.role === "student") {
+      const studentObj = await Student.getByUserId(userId);
+      if (!studentObj) {
+        return res.status(404).json({ message: 'Student not found' });
+      }
+      const studentId = studentObj.id;
 
-    const [studentRows] = await Student.getById(studentId);
-    if (!studentRows || studentRows.length === 0) {
-      return res.status(404).json({ message: 'Student details not found' });
-    }
-    const student = studentRows[0];
-    console.log('student: ',student);
+      const [studentRows] = await Student.getById(studentId);
+      if (!studentRows || studentRows.length === 0) {
+        return res.status(404).json({ message: 'Student details not found' });
+      }
+      const student = studentRows[0];
 
-    res.status(200).json({
-      ...user.toObject(),
-      studentId: student.id,
-      studentStatus: student.status,
-    });
+      return res.status(200).json({
+        ...user.toObject(),
+        studentId: student.id,
+        studentStatus: student.status,
+      });
+    }
+
+    if (user.role === "teacher") {
+      const teacherObj = await Teacher.getByUserId(userId);
+      if (!teacherObj) {
+        return res.status(404).json({ message: 'Teacher not found' });
+      }
+      const teacherId = teacherObj.id;
+
+      const [teacherRows] = await Teacher.findById(teacherId);
+      if (!teacherRows || teacherRows.length === 0) {
+        return res.status(404).json({ message: 'Teacher details not found' });
+      }
+      const teacher = teacherRows[0];
+
+      return res.status(200).json({
+        ...user.toObject(),
+        teacherId: teacher.id,
+        teacherStatus: teacher.status,
+      });
+    }
+
+    res.status(200).json(user.toObject());
+
   } catch (err) {
-    console.error(err);
+    console.error("Error in getUserProfile:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 exports.updateUserProfile = async (req, res) => {
   try {

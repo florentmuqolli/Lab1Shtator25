@@ -49,8 +49,6 @@ const Login = () => {
       localStorage.setItem("accessToken", response.data.accessToken);
       localStorage.setItem("role", response.data.user.role);
 
-      toast.success("Logged in successfully");
-
       setTimeout(() => {
         if (response.data.user.role === "admin") {
           navigate("/admin-dashboard");

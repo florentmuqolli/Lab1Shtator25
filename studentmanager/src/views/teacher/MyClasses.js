@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Button, Form, Spinner, Badge, Modal } from 'react-bootstrap';
+import { Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '../../services/axiosInstance';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import '../../styles/MyClasses.css';
 
 const MyClasses = () => {
   const navigate = useNavigate();
@@ -13,15 +14,26 @@ const MyClasses = () => {
   const [loading, setLoading] = useState(true);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const [elapsedTime, setElapsedTime] = useState('');
+
+  useEffect(() => {
+    if (!lastUpdated) return;
+    const interval = setInterval(() => {
+      const secondsAgo = Math.floor((Date.now() - lastUpdated.getTime()) / 1000);
+      setElapsedTime(secondsAgo < 60 ? `${secondsAgo}s ago` : `${Math.floor(secondsAgo / 60)}m ago`);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [lastUpdated]);
 
   const fetchCourses = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('/class/specific-class');
+      const res = await axiosInstance.get('/class/specific-class');
       const coursesWithCounts = await Promise.all(
         res.data.map(async (course) => {
           try {
-            const countRes = await axios.get(`/enrollment/total`);
+            const countRes = await axiosInstance.get(`/enrollment/total`);
             return {
               ...course,
               totalStudents: countRes.data.totalStudents || 0,
@@ -34,7 +46,7 @@ const MyClasses = () => {
       );
       setCourses(coursesWithCounts);
       setFilteredCourses(coursesWithCounts);
-      toast.success('Courses loaded successfully');
+      setLastUpdated(new Date());
     } catch (err) {
       console.error('Error fetching courses:', err);
       toast.error('Failed to load courses');
@@ -86,247 +98,281 @@ const MyClasses = () => {
 
   if (loading) {
     return (
-      <div className="d-flex justify-content-center align-items-center min-vh-100 bg-light">
-        <div className="text-center">
-          <Spinner animation="border" variant="primary" style={{ width: '3rem', height: '3rem' }} />
-          <p className="text-muted mt-3">Loading your courses...</p>
-        </div>
+      <div className="dashboard-loading-container">
+        <div className="dashboard-loading-spinner"></div>
+        <p className="dashboard-loading-text">Loading your courses...</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-light min-vh-100">
-      {}
-      <div className="bg-white shadow-sm py-3">
-        <Container>
-          <Row className="align-items-center">
-            <Col>
-              <h4 className="fw-bold text-dark mb-0">My Courses</h4>
-            </Col>
-            <Col xs="auto">
-              <Button 
-                variant="outline-primary" 
-                size="sm"
+    <div className="dashboard-container">
+      <header className="dashboard-header">
+        <div className="dashboard-header-content">
+          <div className="dashboard-header-left">
+            <div className="header-navigation">
+              <button
+                className="back-button"
                 onClick={() => navigate(-1)}
+                title="Go back"
               >
-                <i className="fas fa-arrow-left me-1"></i> Back
-              </Button>
-            </Col>
-          </Row>
-        </Container>
-      </div>
+                <span className="back-icon">←</span>
+                Back
+              </button>
+            </div>
+            <div className="header-titles">
+              <h1 className="dashboard-title">My Courses</h1>
+              <p className="dashboard-subtitle">Manage and monitor all your teaching assignments</p>
+            </div>
+          </div>
+          <div className="dashboard-header-right">
+            <button
+              className="dashboard-refresh-btn"
+              onClick={fetchCourses}
+              disabled={loading}
+            >
+              <span className={`dashboard-refresh-icon ${loading ? 'loading' : ''}`}>
+                ↻
+              </span>
+              {loading ? 'Updating...' : 'Refresh'}
+            </button>
+          </div>
+        </div>
+      </header>
 
-      <Container className="py-4">
-        {}
-        <Row className="mb-4">
-          <Col lg={8} className="mb-3">
-            <Card className="border-0 shadow-sm">
-              <Card.Body className="p-3">
-                <div className="d-flex align-items-center">
-                  <i className="fas fa-search text-muted me-2"></i>
-                  <Form.Control
-                    type="text"
-                    placeholder="Search courses by title, description, or room..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="border-0"
-                  />
+      <main className="dashboard-main">
+        <div className="dashboard-welcome-card">
+          <div className="welcome-card-content">
+            <div className="welcome-text">
+              <h2>Course Management 📚</h2>
+              <p>Overview of all your teaching assignments. Track schedules, student enrollment, and course details in one place.</p>
+              {elapsedTime && (
+                <div className="last-updated">
+                  <span className="update-indicator"></span>
+                  Last updated {elapsedTime}
                 </div>
-              </Card.Body>
-            </Card>
-          </Col>
-          <Col lg={4} className="mb-3">
-            <Row className="g-3">
-              <Col xs={6}>
-                <Card className="border-0 shadow-sm text-center h-100">
-                  <Card.Body className="p-3">
-                    <h3 className="fw-bold text-primary mb-1">{courses.length}</h3>
-                    <small className="text-muted">Total Courses</small>
-                  </Card.Body>
-                </Card>
-              </Col>
-              <Col xs={6}>
-                <Card className="border-0 shadow-sm text-center h-100">
-                  <Card.Body className="p-3">
-                    <h3 className="fw-bold text-success mb-1">
-                      {courses.reduce((total, course) => total + (course.totalStudents || 0), 0)}
-                    </h3>
-                    <small className="text-muted">Total Students</small>
-                  </Card.Body>
-                </Card>
-              </Col>
-            </Row>
-          </Col>
-        </Row>
+              )}
+            </div>
+            <div className="welcome-graphic">
+              <div className="graphic-icon">🏫</div>
+            </div>
+          </div>
+        </div>
 
-        {}
-        {filteredCourses.length > 0 ? (
-          <Row>
-            {filteredCourses.map((course) => (
-              <Col md={6} lg={4} key={course.id} className="mb-4">
-                <Card 
-                  className="border-0 shadow-sm h-100 course-card"
-                  onClick={() => openCourseDetails(course)}
-                  style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
-                  onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
-                  onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+        <div className="dashboard-content-grid">
+          <div className="content-card search-card">
+            <div className="search-container">
+              <div className="search-icon">🔍</div>
+              <input
+                type="text"
+                placeholder="Search courses by title, description, or room..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="search-input"
+              />
+              {searchQuery && (
+                <button 
+                  className="search-clear-btn"
+                  onClick={() => setSearchQuery('')}
                 >
-                  <Card.Body className="p-4">
-                    <div className="d-flex justify-content-between align-items-start mb-3">
-                      <Badge bg="light" text="dark" className="fw-normal">
-                        ID: {course.id}
-                      </Badge>
-                      <Badge bg={getStatusVariant(course.status)}>
+                  ×
+                </button>
+              )}
+            </div>
+          </div>
+          
+          <div className="content-card stats-card">
+            <div className="stats-grid-mini">
+              <div className="stat-item">
+                <div className="stat-icon courses">📚</div>
+                <div className="stat-content">
+                  <h3>{courses.length}</h3>
+                  <p>Total Courses</p>
+                </div>
+              </div>
+              <div className="stat-item">
+                <div className="stat-icon students">👥</div>
+                <div className="stat-content">
+                  <h3>{courses.reduce((total, course) => total + (course.totalStudents || 0), 0)}</h3>
+                  <p>Total Students</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="content-card courses-grid-card">
+          <div className="card-header">
+            <h3>
+              {searchQuery ? `Search Results (${filteredCourses.length})` : 'All Courses'}
+            </h3>
+            <span className="results-count">
+              Showing {filteredCourses.length} of {courses.length} courses
+            </span>
+          </div>
+
+          <div className="courses-grid">
+            {filteredCourses.length > 0 ? (
+              filteredCourses.map((course) => (
+                <div 
+                  key={course.id} 
+                  className="course-card"
+                  onClick={() => openCourseDetails(course)}
+                >
+                  <div className="course-header">
+                    <div className="course-badges">
+                      <span className="course-id">ID: {course.id}</span>
+                      <span className={`status-badge ${getStatusVariant(course.status)}`}>
                         {course.status || 'Unknown'}
-                      </Badge>
+                      </span>
                     </div>
-
-                    <h6 className="fw-bold text-dark mb-3">{course.title || 'Untitled Course'}</h6>
+                  </div>
+                  
+                  <div className="course-body">
+                    <h4 className="course-title">{course.title || 'Untitled Course'}</h4>
                     
-                    <div className="mb-3">
-                      <small className="text-muted">Description</small>
-                      <p className="text-dark small mb-0">
-                        {course.description || 'No description provided'}
-                      </p>
+                    <div className="course-description">
+                      {course.description || 'No description provided'}
                     </div>
 
-                    <div className="mb-3">
-                      <div className="d-flex align-items-center mb-2">
-                        <i className="fas fa-clock text-primary me-2"></i>
-                        <small className="text-muted">{course.schedule || 'Schedule TBA'}</small>
+                    <div className="course-meta">
+                      <div className="meta-item">
+                        <span className="meta-icon">⏰</span>
+                        <span className="meta-text">{course.schedule || 'Schedule TBA'}</span>
                       </div>
-                      <div className="d-flex align-items-center mb-2">
-                        <i className="fas fa-calendar text-primary me-2"></i>
-                        <Badge bg={getDayColor(course.day)}>
+                      <div className="meta-item">
+                        <span className="meta-icon">📅</span>
+                        <span className={`day-badge ${getDayColor(course.day)}`}>
                           {course.day || 'Days TBA'}
-                        </Badge>
+                        </span>
                       </div>
-                      <div className="d-flex align-items-center">
-                        <i className="fas fa-map-marker-alt text-primary me-2"></i>
-                        <small className="text-muted">{course.room || 'Room TBA'}</small>
+                      <div className="meta-item">
+                        <span className="meta-icon">📍</span>
+                        <span className="meta-text">{course.room || 'Room TBA'}</span>
                       </div>
                     </div>
 
-                    <div className="d-flex justify-content-between align-items-center">
-                      <div>
-                        <small className="text-muted d-block">Students Enrolled</small>
-                        <span className="fw-semibold">{course.totalStudents || 0}</span>
+                    <div className="course-footer">
+                      <div className="enrollment-info">
+                        <span className="enrollment-label">Students Enrolled</span>
+                        <span className="enrollment-count">{course.totalStudents || 0}</span>
                       </div>
-                      <Button variant="outline-primary" size="sm">
+                      <button className="view-details-btn">
                         View Details
-                      </Button>
+                      </button>
                     </div>
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        ) : (
-          <Row>
-            <Col>
-              <Card className="border-0 shadow-sm text-center py-5">
-                <Card.Body>
-                  <i className="fas fa-book-open fa-3x text-muted mb-3"></i>
-                  <h5 className="text-dark mb-2">
-                    {searchQuery ? 'No matching courses found' : 'No courses available'}
-                  </h5>
-                  <p className="text-muted mb-4">
-                    {searchQuery 
-                      ? 'Try adjusting your search terms' 
-                      : 'You haven\'t been assigned to any courses yet'}
-                  </p>
-                  {searchQuery && (
-                    <Button variant="outline-primary" onClick={() => setSearchQuery('')}>
-                      Clear Search
-                    </Button>
-                  )}
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
-        )}
-      </Container>
-
-      {}
-      <Modal show={showDetailModal} onHide={() => setShowDetailModal(false)} centered size="lg">
-        <Modal.Body className="p-4">
-          {selectedCourse && (
-            <>
-              <div className="d-flex justify-content-between align-items-start mb-4">
-                <div>
-                  <h4 className="fw-bold text-dark mb-2">{selectedCourse.title}</h4>
-                  <div className="d-flex align-items-center gap-3">
-                    <Badge bg={getStatusVariant(selectedCourse.status)}>
-                      {selectedCourse.status}
-                    </Badge>
-                    <Badge bg="light" text="dark">
-                      ID: {selectedCourse.id}
-                    </Badge>
                   </div>
                 </div>
-                <Button variant="outline-secondary" size="sm" onClick={() => setShowDetailModal(false)}>
-                  <i className="fas fa-times"></i>
-                </Button>
+              ))
+            ) : (
+              <div className="empty-state">
+                <div className="empty-icon">📚</div>
+                <h4>
+                  {searchQuery ? 'No matching courses found' : 'No courses available'}
+                </h4>
+                <p>
+                  {searchQuery 
+                    ? 'Try adjusting your search terms' 
+                    : 'You haven\'t been assigned to any courses yet'}
+                </p>
+                {searchQuery && (
+                  <button 
+                    className="action-btn primary"
+                    onClick={() => setSearchQuery('')}
+                  >
+                    Clear Search
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </main>
+
+      <Modal show={showDetailModal} onHide={() => setShowDetailModal(false)} centered className="wide-modal">
+        <div className="modal-header-gradient">
+          <div className="modal-header-content">
+            <div className="modal-title-section">
+              <div className="modal-icon">
+                📚
+              </div>
+              <div>
+                <h3>{selectedCourse?.title}</h3>
+                <p>Course details and information</p>
+              </div>
+            </div>
+            <button className="modal-close-btn" onClick={() => setShowDetailModal(false)}>×</button>
+          </div>
+        </div>
+        
+        <div className="modal-body-custom">
+          {selectedCourse && (
+            <div className="course-detail-content">
+              <div className="course-badges-header">
+                <span className={`status-badge large ${getStatusVariant(selectedCourse.status)}`}>
+                  {selectedCourse.status}
+                </span>
+                <span className="course-id-badge">
+                  ID: {selectedCourse.id}
+                </span>
               </div>
 
-              <Row className="g-3 mb-4">
-                <Col md={6}>
-                  <Card className="border-0 bg-light">
-                    <Card.Body className="p-3">
-                      <small className="text-muted d-block">Schedule</small>
-                      <span className="fw-semibold">{selectedCourse.schedule || 'TBA'}</span>
-                    </Card.Body>
-                  </Card>
-                </Col>
-                <Col md={6}>
-                  <Card className="border-0 bg-light">
-                    <Card.Body className="p-3">
-                      <small className="text-muted d-block">Day</small>
-                      <Badge bg={getDayColor(selectedCourse.day)}>
-                        {selectedCourse.day || 'TBA'}
-                      </Badge>
-                    </Card.Body>
-                  </Card>
-                </Col>
-                <Col md={6}>
-                  <Card className="border-0 bg-light">
-                    <Card.Body className="p-3">
-                      <small className="text-muted d-block">Room</small>
-                      <span className="fw-semibold">{selectedCourse.room || 'TBA'}</span>
-                    </Card.Body>
-                  </Card>
-                </Col>
-                <Col md={6}>
-                  <Card className="border-0 bg-light">
-                    <Card.Body className="p-3">
-                      <small className="text-muted d-block">Students Enrolled</small>
-                      <span className="fw-semibold">{selectedCourse.totalStudents || 0}</span>
-                    </Card.Body>
-                  </Card>
-                </Col>
-              </Row>
+              <div className="detail-grid">
+                <div className="detail-card">
+                  <div className="detail-icon">⏰</div>
+                  <div className="detail-content">
+                    <span className="detail-label">Schedule</span>
+                    <span className="detail-value">{selectedCourse.schedule || 'TBA'}</span>
+                  </div>
+                </div>
+                
+                <div className="detail-card">
+                  <div className="detail-icon">📅</div>
+                  <div className="detail-content">
+                    <span className="detail-label">Day</span>
+                    <span className={`day-badge large ${getDayColor(selectedCourse.day)}`}>
+                      {selectedCourse.day || 'TBA'}
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="detail-card">
+                  <div className="detail-icon">📍</div>
+                  <div className="detail-content">
+                    <span className="detail-label">Room</span>
+                    <span className="detail-value">{selectedCourse.room || 'TBA'}</span>
+                  </div>
+                </div>
+                
+                <div className="detail-card">
+                  <div className="detail-icon">👥</div>
+                  <div className="detail-content">
+                    <span className="detail-label">Students Enrolled</span>
+                    <span className="detail-value enrollment">{selectedCourse.totalStudents || 0}</span>
+                  </div>
+                </div>
+              </div>
 
-              <div className="mb-4">
-                <h6 className="fw-bold text-dark mb-3">Course Description</h6>
-                <p className="text-dark">
+              <div className="description-section">
+                <h4 className="section-title">Course Description</h4>
+                <p className="description-text">
                   {selectedCourse.description || 'No description provided.'}
                 </p>
               </div>
 
-              <div className="text-center">
-                <Button variant="primary" className="me-2">
-                  <i className="fas fa-users me-2"></i>
+              <div className="action-buttons">
+                <button className="action-btn primary large">
+                  <span className="btn-icon">👥</span>
                   View Students
-                </Button>
-                <Button variant="outline-primary">
-                  <i className="fas fa-edit me-2"></i>
+                </button>
+                <button className="action-btn secondary large">
+                  <span className="btn-icon">✏️</span>
                   Edit Course
-                </Button>
+                </button>
               </div>
-            </>
+            </div>
           )}
-        </Modal.Body>
+        </div>
       </Modal>
     </div>
   );

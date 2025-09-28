@@ -1,30 +1,46 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Button, Form, Spinner, Badge, Modal } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axiosInstance from '../../services/axiosInstance';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import '../../styles/StudentGrades.css';
 
 const Grades = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [grades, setGrades] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedGrade, setSelectedGrade] = useState(null);
-  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const [elapsedTime, setElapsedTime] = useState("");
+
+  useEffect(() => {
+    if (!lastUpdated) return;
+    const interval = setInterval(() => {
+      const secondsAgo = Math.floor((Date.now() - lastUpdated.getTime()) / 1000);
+      setElapsedTime(secondsAgo < 60 ? `${secondsAgo}s ago` : `${Math.floor(secondsAgo / 60)}m ago`);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [lastUpdated]);
 
   const fetchGrades = async () => {
     setLoading(true);
     try {
-      const res = await axios.get('/grades/my'); 
+      const res = await axiosInstance.get('/grades/my'); 
       setGrades(res.data);
-      toast.success('Grades loaded successfully');
+      setLastUpdated(new Date());
     } catch (err) {
       console.error('Error fetching grades:', err);
       toast.error('Failed to fetch grades');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await fetchGrades();
+    setTimeout(() => setRefreshing(false), 1000);
   };
 
   useEffect(() => {
@@ -38,12 +54,25 @@ const Grades = () => {
   const averageGrade = grades.length > 0 ? 
     (grades.reduce((sum, grade) => sum + parseFloat(grade.grade || 0), 0) / grades.length).toFixed(1) : 0;
 
-  const openGradeDetails = (grade) => {
-    setSelectedGrade(grade);
-    setShowDetailModal(true);
+  const getGradeIcon = (grade) => {
+    if (!grade) return '❓';
+    const numericGrade = parseFloat(grade);
+    if (numericGrade >= 90) return '🏆';
+    if (numericGrade >= 80) return '⭐';
+    if (numericGrade >= 70) return '✅';
+    return '⚠️';
   };
 
-  const getGradeColor = (grade) => {
+  const getGradeStatus = (grade) => {
+    if (!grade) return 'Not Graded';
+    const numericGrade = parseFloat(grade);
+    if (numericGrade >= 90) return 'Excellent';
+    if (numericGrade >= 80) return 'Great';
+    if (numericGrade >= 70) return 'Good';
+    return 'Needs Improvement';
+  };
+
+  const getGradeVariant = (grade) => {
     if (!grade) return 'secondary';
     const numericGrade = parseFloat(grade);
     if (numericGrade >= 90) return 'success';
@@ -52,225 +81,239 @@ const Grades = () => {
     return 'danger';
   };
 
-  const getGradeIcon = (grade) => {
-    if (!grade) return 'fa-question-circle';
-    const numericGrade = parseFloat(grade);
-    if (numericGrade >= 90) return 'fa-trophy';
-    if (numericGrade >= 80) return 'fa-star';
-    if (numericGrade >= 70) return 'fa-check-circle';
-    return 'fa-exclamation-circle';
-  };
-
-  if (loading) {
+  if (loading && grades.length === 0) {
     return (
-      <div className="d-flex justify-content-center align-items-center min-vh-100 bg-light">
-        <div className="text-center">
-          <Spinner animation="border" variant="primary" style={{ width: '3rem', height: '3rem' }} />
-          <p className="text-muted mt-3">Loading your grades...</p>
-        </div>
+      <div className="dashboard-loading-container">
+        <div className="dashboard-loading-spinner"></div>
+        <p className="dashboard-loading-text">Loading your grades...</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-light min-vh-100">
-      {}
-      <div className="bg-white shadow-sm py-3">
-        <Container>
-          <Row className="align-items-center">
-            <Col>
-              <h4 className="fw-bold text-dark mb-0">Grades Overview</h4>
-            </Col>
-            <Col xs="auto">
-              <Button 
-                variant="outline-primary" 
-                size="sm"
+    <div className="dashboard-container">
+      <header className="dashboard-header">
+        <div className="dashboard-header-content">
+          <div className="dashboard-header-left">
+            <div className="header-navigation">
+              <button
+                className="back-button"
                 onClick={() => navigate(-1)}
+                title="Go back"
               >
-                <i className="fas fa-arrow-left me-1"></i> Back
-              </Button>
-            </Col>
-          </Row>
-        </Container>
-      </div>
+                <span className="back-icon">←</span>
+                Back
+              </button>
+            </div>
+            <div className="header-titles">
+              <h1 className="dashboard-title">My Grades</h1>
+              <p className="dashboard-subtitle">Track your academic performance and progress</p>
+            </div>
+          </div>
+          <div className="dashboard-header-right">
+            <button
+              className="dashboard-refresh-btn"
+              onClick={handleRefresh}
+              disabled={refreshing}
+            >
+              <span className={`dashboard-refresh-icon ${refreshing ? 'loading' : ''}`}>
+                ↻
+              </span>
+              {refreshing ? 'Refreshing...' : 'Refresh'}
+            </button>
+          </div>
+        </div>
+      </header>
 
-      <Container className="py-4">
-        {}
-        <Row className="mb-4">
-          <Col lg={8} className="mb-3">
-            <Card className="border-0 shadow-sm">
-              <Card.Body className="p-3">
-                <div className="d-flex align-items-center">
-                  <i className="fas fa-search text-muted me-2"></i>
-                  <Form.Control
-                    type="text"
-                    placeholder="Search grades by class name..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="border-0"
-                  />
+      <main className="dashboard-main">
+        <div className="dashboard-welcome-card">
+          <div className="welcome-card-content">
+            <div className="welcome-text">
+              <h2>Academic Performance 📊</h2>
+              <p>Monitor your grades and track your progress across all courses</p>
+              {elapsedTime && (
+                <div className="last-updated">
+                  <span className="update-indicator"></span>
+                  Last updated {elapsedTime}
                 </div>
-              </Card.Body>
-            </Card>
-          </Col>
-          <Col lg={4} className="mb-3">
-            <Row className="g-3">
-              <Col xs={6}>
-                <Card className="border-0 shadow-sm text-center h-100">
-                  <Card.Body className="p-3">
-                    <h3 className="fw-bold text-primary mb-1">{grades.length}</h3>
-                    <small className="text-muted">Total Grades</small>
-                  </Card.Body>
-                </Card>
-              </Col>
-              <Col xs={6}>
-                <Card className="border-0 shadow-sm text-center h-100">
-                  <Card.Body className="p-3">
-                    <h3 className="fw-bold text-success mb-1">{averageGrade}</h3>
-                    <small className="text-muted">Average</small>
-                  </Card.Body>
-                </Card>
-              </Col>
-            </Row>
-          </Col>
-        </Row>
-
-        {}
-        {filteredGrades.length > 0 ? (
-          <Row>
-            {filteredGrades.map((grade) => (
-              <Col md={6} lg={4} key={grade.id} className="mb-4">
-                <Card 
-                  className="border-0 shadow-sm h-100 grade-card"
-                  onClick={() => openGradeDetails(grade)}
-                  style={{ cursor: 'pointer', transition: 'transform 0.2s' }}
-                  onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-4px)'}
-                  onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              )}
+            </div>
+            <div className="welcome-graphic">
+              <div className="graphic-icon">🎓</div>
+            </div>
+          </div>
+        </div>
+        <div className="dashboard-content-grid">
+          <div className="content-card search-card">
+            <div className="search-container">
+              <div className="search-icon">🔍</div>
+              <input
+                type="text"
+                placeholder="Search grades by class name..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="search-input"
+              />
+              {searchQuery && (
+                <button 
+                  className="search-clear-btn"
+                  onClick={() => setSearchQuery('')}
                 >
-                  <Card.Body className="p-4">
-                    <div className="d-flex justify-content-between align-items-start mb-3">
-                      <Badge bg="light" text="dark" className="fw-normal">
-                        {grade.code || `GRD-${grade.id}`}
-                      </Badge>
-                      <div className={`bg-${getGradeColor(grade.grade)} bg-opacity-10 p-2 rounded`}>
-                        <i className={`fas ${getGradeIcon(grade.grade)} text-${getGradeColor(grade.grade)}`}></i>
+                  ×
+                </button>
+              )}
+            </div>
+          </div>
+          
+          <div className="content-card stats-card">
+            <div className="stats-grid-mini">
+              <div className="stat-item">
+                <div className="stat-icon total">📋</div>
+                <div className="stat-content">
+                  <h3>{grades.length}</h3>
+                  <p>Total Grades</p>
+                </div>
+              </div>
+              <div className="stat-item">
+                <div className="stat-icon average">📈</div>
+                <div className="stat-content">
+                  <h3>{averageGrade}</h3>
+                  <p>Average Grade</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="content-card stats-overview-card">
+          <div className="card-header">
+            <h3>Performance Overview</h3>
+            <div className="results-count">
+              {filteredGrades.length} of {grades.length} shown
+            </div>
+          </div>
+
+          <div className="stats-grid">
+            <div className="stat-card">
+              <div className="stat-icon total">📋</div>
+              <div className="stat-content">
+                <h3>{grades.length}</h3>
+                <p>Total Grades</p>
+              </div>
+              <div className="stat-trend positive">All courses</div>
+            </div>
+
+            <div className="stat-card">
+              <div className="stat-icon average">📈</div>
+              <div className="stat-content">
+                <h3>{averageGrade}</h3>
+                <p>Average Grade</p>
+              </div>
+              <div className="stat-trend positive">Overall</div>
+            </div>
+
+            <div className="stat-card">
+              <div className="stat-icon high">🏆</div>
+              <div className="stat-content">
+                <h3>
+                  {grades.length > 0 ? Math.max(...grades.map(g => parseFloat(g.grade || 0))) : 0}
+                </h3>
+                <p>Highest Grade</p>
+              </div>
+              <div className="stat-trend positive">Excellent</div>
+            </div>
+
+            <div className="stat-card">
+              <div className="stat-icon progress">🎯</div>
+              <div className="stat-content">
+                <h3>{grades.filter(g => parseFloat(g.grade || 0) >= 70).length}</h3>
+                <p>Passing Grades</p>
+              </div>
+              <div className="stat-trend positive">Good standing</div>
+            </div>
+          </div>
+        </div>
+        <div className="content-card grades-grid-card">
+          <div className="card-header">
+            <h3>
+              {searchQuery ? `Search Results (${filteredGrades.length})` : 'All Grades'}
+            </h3>
+            <span className="results-count">
+              {filteredGrades.length} {filteredGrades.length === 1 ? 'grade' : 'grades'}
+            </span>
+          </div>
+
+          {filteredGrades.length > 0 ? (
+            <div className="grades-grid">
+              {filteredGrades.map((grade) => (
+                <div 
+                  key={grade.id} 
+                  className="grade-card"
+                >
+                  <div className="grade-header">
+                    <div className="course-info">
+                      <div className="course-icon">📚</div>
+                      <div className="course-details">
+                        <h4 className="course-title">{grade.class_title || 'No Class Title'}</h4>
+                        <span className="grade-type">Coursework Assessment</span>
                       </div>
                     </div>
-
-                    <h6 className="fw-bold text-dark mb-2">{grade.class_title || 'No Class Title'}</h6>
-                    <p className="text-muted small mb-3">Coursework Assessment</p>
-
-                    <div className="text-center mb-3">
-                      <div className={`display-4 fw-bold text-${getGradeColor(grade.grade)}`}>
+                    <div className="grade-code">{grade.code || `GRD-${grade.id}`}</div>
+                  </div>
+                  
+                  <div className="grade-body">
+                    <div className="grade-display">
+                      <div 
+                        className={`grade-value ${getGradeVariant(grade.grade)}`}
+                      >
                         {grade.grade || 'N/A'}
                       </div>
-                      <small className="text-muted">Current Grade</small>
+                      <div 
+                        className={`grade-status ${getGradeVariant(grade.grade)}`}
+                      >
+                        {getGradeStatus(grade.grade)}
+                      </div>
+                      <div className="grade-icon-large">
+                        {getGradeIcon(grade.grade)}
+                      </div>
                     </div>
 
-                    <div className="border-top pt-3">
-                      <div className="d-flex justify-content-between align-items-center mb-2">
-                        <small className="text-muted">Graded on:</small>
-                        <small className="fw-semibold">
+                    <div className="grade-meta">
+                      <div className="meta-item">
+                        <span className="meta-icon">📅</span>
+                        <span className="meta-text">
                           {grade.graded_at ? new Date(grade.graded_at).toLocaleDateString() : 'N/A'}
-                        </small>
+                        </span>
                       </div>
-                      <div className="d-flex justify-content-between align-items-center">
-                        <small className="text-muted">Student ID:</small>
-                        <small className="fw-semibold">{grade.student_id || 'N/A'}</small>
+                      <div className="meta-item">
+                        <span className="meta-icon">👤</span>
+                        <span className="meta-text">Student ID: {grade.student_id || 'N/A'}</span>
                       </div>
                     </div>
-                  </Card.Body>
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        ) : (
-          <Row>
-            <Col>
-              <Card className="border-0 shadow-sm text-center py-5">
-                <Card.Body>
-                  <i className="fas fa-clipboard-list fa-3x text-muted mb-3"></i>
-                  <h5 className="text-dark mb-2">
-                    {searchQuery ? 'No matching grades found' : 'No grades available'}
-                  </h5>
-                  <p className="text-muted mb-4">
-                    {searchQuery 
-                      ? 'Try adjusting your search terms' 
-                      : 'Your grades will appear here once they are published'}
-                  </p>
-                  {searchQuery && (
-                    <Button variant="outline-primary" onClick={() => setSearchQuery('')}>
-                      Clear Search
-                    </Button>
-                  )}
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
-        )}
-      </Container>
-
-      {}
-      <Modal show={showDetailModal} onHide={() => setShowDetailModal(false)} centered size="lg">
-        <Modal.Body className="p-4">
-          {selectedGrade && (
-            <>
-              <div className="text-center mb-4">
-                <div className={`bg-${getGradeColor(selectedGrade.grade)} bg-opacity-10 p-3 rounded-circle d-inline-flex align-items-center justify-content-center mb-3`}>
-                  <i className={`fas ${getGradeIcon(selectedGrade.grade)} fa-2x text-${getGradeColor(selectedGrade.grade)}`}></i>
+                  </div>
                 </div>
-                <h4 className="fw-bold text-dark mb-2">{selectedGrade.class_title}</h4>
-                <Badge bg={getGradeColor(selectedGrade.grade)} className="px-3 py-2 mb-3">
-                  Grade: {selectedGrade.grade || 'N/A'}
-                </Badge>
-              </div>
-
-              <Row className="g-3 mb-4">
-                <Col md={6}>
-                  <Card className="border-0 bg-light">
-                    <Card.Body className="p-3">
-                      <small className="text-muted d-block">Course Code</small>
-                      <span className="fw-semibold">{selectedGrade.code || 'N/A'}</span>
-                    </Card.Body>
-                  </Card>
-                </Col>
-                <Col md={6}>
-                  <Card className="border-0 bg-light">
-                    <Card.Body className="p-3">
-                      <small className="text-muted d-block">Student ID</small>
-                      <span className="fw-semibold">{selectedGrade.student_id || 'N/A'}</span>
-                    </Card.Body>
-                  </Card>
-                </Col>
-                <Col md={6}>
-                  <Card className="border-0 bg-light">
-                    <Card.Body className="p-3">
-                      <small className="text-muted d-block">Graded Date</small>
-                      <span className="fw-semibold">
-                        {selectedGrade.graded_at ? new Date(selectedGrade.graded_at).toLocaleDateString() : 'N/A'}
-                      </span>
-                    </Card.Body>
-                  </Card>
-                </Col>
-                <Col md={6}>
-                  <Card className="border-0 bg-light">
-                    <Card.Body className="p-3">
-                      <small className="text-muted d-block">Status</small>
-                      <span className="fw-semibold">Published</span>
-                    </Card.Body>
-                  </Card>
-                </Col>
-              </Row>
-
-              <div className="text-center">
-                <Button variant="outline-primary" onClick={() => setShowDetailModal(false)}>
-                  Close Details
-                </Button>
-              </div>
-            </>
+              ))}
+            </div>
+          ) : (
+            <div className="empty-state">
+              <div className="empty-icon">📊</div>
+              <h4>{searchQuery ? 'No Matching Grades Found' : 'No Grades Available'}</h4>
+              <p>
+                {searchQuery 
+                  ? 'Try adjusting your search terms to find what you\'re looking for.' 
+                  : 'Your grades will appear here once they are published by your instructors.'}
+              </p>
+              {searchQuery && (
+                <button 
+                  className="action-btn primary"
+                  onClick={() => setSearchQuery('')}
+                >
+                  Clear Search
+                </button>
+              )}
+            </div>
           )}
-        </Modal.Body>
-      </Modal>
+        </div>
+      </main>
     </div>
   );
 };

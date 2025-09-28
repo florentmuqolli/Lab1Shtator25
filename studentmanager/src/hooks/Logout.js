@@ -13,9 +13,6 @@ const useLogout = (setLoading) => {
       });
       localStorage.removeItem("accessToken");
       localStorage.removeItem("role");
-
-      toast.success("Logged out");
-
       setTimeout(() => {
         setLoading(false);
         navigate("/login", { replace: true });

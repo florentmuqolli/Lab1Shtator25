@@ -270,15 +270,15 @@ const TeacherDashboard = () => {
                       <div className="action-icon">📊</div>
                       <span>Grades</span>
                     </button>
-                    <button className="action-btn" onClick={() => navigate('/teacher-attendance')}>
+                    <button className="action-btn" onClick={() => navigate('/coming-soon')}>
                       <div className="action-icon">✅</div>
                       <span>Attendance</span>
                     </button>
-                    <button className="action-btn" onClick={() => navigate('/teacher-students')}>
+                    <button className="action-btn" onClick={() => navigate('/coming-soon')}>
                       <div className="action-icon">👥</div>
                       <span>Students</span>
                     </button>
-                    <button className="action-btn" onClick={() => navigate('/teacher-schedule')}>
+                    <button className="action-btn" onClick={() => navigate('/coming-soon')}>
                       <div className="action-icon">📅</div>
                       <span>Schedule</span>
                     </button>

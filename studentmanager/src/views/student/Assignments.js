@@ -16,10 +16,21 @@ const Assignments = () => {
   const [selectedAssignment, setSelectedAssignment] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const [elapsedTime, setElapsedTime] = useState("");
 
   useEffect(() => {
-    fetchAssignments();
-  }, []);
+      fetchAssignments();
+    }, []);
+
+  useEffect(() => {
+    if (!lastUpdated) return;
+    const interval = setInterval(() => {
+      const secondsAgo = Math.floor((Date.now() - lastUpdated.getTime()) / 1000);
+      setElapsedTime(secondsAgo < 60 ? `${secondsAgo}s ago` : `${Math.floor(secondsAgo / 60)}m ago`);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [lastUpdated]);
 
   const fetchAssignments = async () => {
     setLoading(true);
@@ -27,6 +38,7 @@ const Assignments = () => {
       const response = await axiosInstance.get("/assignments");
       setAssignments(response.data);
       setFilteredAssignments(response.data);
+      setLastUpdated(new Date());
     } catch (err) {
       setError("Failed to load assignments.");
       console.error(err);
@@ -117,7 +129,7 @@ const Assignments = () => {
   };
 
   const getCourseIcon = (courseName) => {
-    const subject = courseName?.toLowerCase() || '';
+  const subject = String(courseName || '').toLowerCase();
     if (subject.includes('math')) return '∫';
     if (subject.includes('science') || subject.includes('physics')) return '⚛';
     if (subject.includes('english') || subject.includes('literature')) return '📖';
@@ -125,15 +137,6 @@ const Assignments = () => {
     if (subject.includes('art')) return '🎨';
     if (subject.includes('computer')) return '💻';
     return '📚';
-  };
-
-  const getAssignmentStats = () => {
-    const pending = assignments.filter(a => a.status === 'pending').length;
-    const inProgress = assignments.filter(a => a.status === 'in progress').length;
-    const completed = assignments.filter(a => a.status === 'completed').length;
-    const overdue = assignments.filter(a => a.status === 'overdue').length;
-    
-    return { pending, inProgress, completed, overdue };
   };
 
   if (loading && assignments.length === 0) {
@@ -158,15 +161,25 @@ const Assignments = () => {
     );
   }
 
-  const stats = getAssignmentStats();
-
   return (
     <div className="dashboard-container">
       <header className="dashboard-header">
         <div className="dashboard-header-content">
           <div className="dashboard-header-left">
-            <h1 className="dashboard-title">Assignments</h1>
-            <p className="dashboard-subtitle">Manage your tasks and track your progress</p>
+            <div className="header-navigation">
+              <button
+                className="back-button"
+                onClick={() => navigate(-1)}
+                title="Go back"
+              >
+                <span className="back-icon">←</span>
+                Back
+              </button>
+            </div>
+            <div className="header-titles">
+              <h1 className="dashboard-title">My Assignments</h1>
+              <p className="dashboard-subtitle">Manage your tasks and track your academic progress</p>
+            </div>
           </div>
           <div className="dashboard-header-right">
             <button
@@ -179,122 +192,40 @@ const Assignments = () => {
               </span>
               {refreshing ? 'Refreshing...' : 'Refresh'}
             </button>
-            <button 
-              className="dashboard-refresh-btn"
-              onClick={() => navigate(-1)}
-              style={{ background: 'linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%)' }}
-            >
-              <span>←</span>
-              Back
-            </button>
           </div>
         </div>
       </header>
 
       <main className="dashboard-main">
-        {/* Welcome Card */}
         <div className="dashboard-welcome-card">
           <div className="welcome-card-content">
             <div className="welcome-text">
-              <h2>Your Assignments Overview 📋</h2>
+              <h2>Assignment Overview 📋</h2>
               <p>Stay organized and on top of your academic tasks and deadlines</p>
-              <div className="last-updated">
-                <span className="update-indicator"></span>
-                {assignments.length} {assignments.length === 1 ? 'assignment' : 'assignments'} total
-              </div>
+              {elapsedTime && (
+                <div className="last-updated">
+                  <span className="update-indicator"></span>
+                  Last updated {elapsedTime}
+                </div>
+              )}
             </div>
             <div className="welcome-graphic">
               <div className="graphic-icon">📚</div>
             </div>
           </div>
         </div>
-
-        {/* Stats and Filters */}
-        <div className="content-card">
+        
+        <div className="content-card filters-card">
           <div className="card-header">
-            <h3>Assignment Overview</h3>
-            <div className="view-all-btn">
+            <h3>Sort Assignments</h3>
+            <div className="results-count">
               {filteredAssignments.length} of {assignments.length} shown
-            </div>
-          </div>
-
-          <div className="stats-grid">
-            <div className="stat-card">
-              <div className="stat-icon pending">⏳</div>
-              <div className="stat-content">
-                <h3>{stats.pending}</h3>
-                <p>Pending</p>
-              </div>
-              <div className="stat-trend warning">Awaiting start</div>
-            </div>
-
-            <div className="stat-card">
-              <div className="stat-icon progress">🔄</div>
-              <div className="stat-content">
-                <h3>{stats.inProgress}</h3>
-                <p>In Progress</p>
-              </div>
-              <div className="stat-trend positive">Active</div>
-            </div>
-
-            <div className="stat-card">
-              <div className="stat-icon completed">✅</div>
-              <div className="stat-content">
-                <h3>{stats.completed}</h3>
-                <p>Completed</p>
-              </div>
-              <div className="stat-trend positive">Done</div>
-            </div>
-
-            <div className="stat-card">
-              <div className="stat-icon overdue">⚠️</div>
-              <div className="stat-content">
-                <h3>{stats.overdue}</h3>
-                <p>Overdue</p>
-              </div>
-              <div className="stat-trend warning">Needs attention</div>
             </div>
           </div>
 
           <div className="filters-container">
             <div className="filter-group">
-              <label>Filter by Status</label>
-              <div className="filter-buttons">
-                <button 
-                  className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
-                  onClick={() => setFilter('all')}
-                >
-                  All
-                </button>
-                <button 
-                  className={`filter-btn ${filter === 'pending' ? 'active' : ''}`}
-                  onClick={() => setFilter('pending')}
-                >
-                  Pending
-                </button>
-                <button 
-                  className={`filter-btn ${filter === 'in progress' ? 'active' : ''}`}
-                  onClick={() => setFilter('in progress')}
-                >
-                  In Progress
-                </button>
-                <button 
-                  className={`filter-btn ${filter === 'completed' ? 'active' : ''}`}
-                  onClick={() => setFilter('completed')}
-                >
-                  Completed
-                </button>
-                <button 
-                  className={`filter-btn ${filter === 'overdue' ? 'active' : ''}`}
-                  onClick={() => setFilter('overdue')}
-                >
-                  Overdue
-                </button>
-              </div>
-            </div>
-
-            <div className="filter-group">
-              <label>Sort by</label>
+              <label className="filter-label">Sort by</label>
               <div className="filter-buttons">
                 <button 
                   className={`filter-btn ${sortBy === 'dueDate' ? 'active' : ''}`}
@@ -308,164 +239,196 @@ const Assignments = () => {
                 >
                   Priority
                 </button>
-                <button 
-                  className={`filter-btn ${sortBy === 'course' ? 'active' : ''}`}
-                  onClick={() => setSortBy('course')}
-                >
-                  Course
-                </button>
               </div>
             </div>
           </div>
         </div>
-
-        {/* Assignments Grid */}
-        {filteredAssignments.length > 0 ? (
-          <div className="assignments-grid">
-            {filteredAssignments.map((assignment) => (
-              <div 
-                key={assignment.id} 
-                className="assignment-card"
-                onClick={() => openAssignmentDetails(assignment)}
-              >
-                <div className="assignment-card-header">
-                  <div className="course-icon">
-                    {getCourseIcon(assignment.class_id)}
-                  </div>
-                  <div 
-                    className="priority-badge"
-                    style={{ background: getPriorityColor(assignment.priority) }}
-                  >
-                    {assignment.priority || 'Standard'}
-                  </div>
-                </div>
-                
-                <div className="assignment-card-content">
-                  <h4>{assignment.title || 'Untitled Assignment'}</h4>
-                  <p className="course-name">{assignment.class_id || 'Unknown Course'}</p>
-                  
-                  <div className="assignment-details">
-                    <div className="detail-item">
-                      <span className="detail-icon">📅</span>
-                      <span>{formatDueDate(assignment.due_date)}</span>
-                    </div>
-                    <div className="detail-item">
-                      <span className="detail-icon">{getStatusIcon(assignment.status)}</span>
-                      <span 
-                        className="status-text"
-                        style={{ color: getStatusColor(assignment.status) }}
-                      >
-                        {assignment.status || 'Unknown Status'}
-                      </span>
-                    </div>
-                  </div>
-
-                  <p className="assignment-description">
-                    {assignment.description || 'No description provided'}
-                  </p>
-
-                  <button className="view-details-btn">
-                    View Details →
-                  </button>
-                </div>
-              </div>
-            ))}
+        <div className="content-card assignments-grid-card">
+          <div className="card-header">
+            <h3>
+              {filter === 'all' ? 'All Assignments' : `${filter.charAt(0).toUpperCase() + filter.slice(1)} Assignments`}
+            </h3>
+            <span className="results-count">
+              {filteredAssignments.length} {filteredAssignments.length === 1 ? 'assignment' : 'assignments'}
+            </span>
           </div>
-        ) : (
-          <div className="content-card text-center py-5">
+
+          {filteredAssignments.length > 0 ? (
+            <div className="assignments-grid">
+              {filteredAssignments.map((assignment) => (
+                <div 
+                  key={assignment.id} 
+                  className="assignment-card"
+                  onClick={() => openAssignmentDetails(assignment)}
+                >
+                  <div className="assignment-header">
+                    <div className="course-badge">
+                      <span className="course-icon">
+                        {getCourseIcon(assignment.class_id)}
+                      </span>
+                      <span className="course-name">{assignment.class_id || 'Unknown Course'}</span>
+                    </div>
+                    <div 
+                      className="priority-badge"
+                      style={{ background: getPriorityColor(assignment.priority) }}
+                    >
+                      {assignment.priority || 'Standard'}
+                    </div>
+                  </div>
+                  
+                  <div className="assignment-body">
+                    <h4 className="assignment-title">{assignment.title || 'Untitled Assignment'}</h4>
+                    
+                    <div className="assignment-meta">
+                      <div className="meta-item">
+                        <span className="meta-icon">📅</span>
+                        <span className="meta-text">{formatDueDate(assignment.due_date)}</span>
+                      </div>
+                      <div className="meta-item">
+                        <span className="meta-icon">{getStatusIcon(assignment.status)}</span>
+                        <span 
+                          className="status-text"
+                          style={{ color: getStatusColor(assignment.status) }}
+                        >
+                          {assignment.status || 'Unknown Status'}
+                        </span>
+                      </div>
+                    </div>
+
+                    <p className="assignment-description">
+                      {assignment.description || 'No description provided'}
+                    </p>
+
+                    <div className="assignment-footer">
+                      <button className="view-details-btn">
+                        View Details
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
             <div className="empty-state">
               <div className="empty-icon">📝</div>
-              <h3>No Assignments Found</h3>
-              <p className="text-muted">
+              <h4>No Assignments Found</h4>
+              <p>
                 {filter === 'all' 
                   ? "You don't have any assignments yet." 
                   : `No assignments match the "${filter}" filter.`}
               </p>
               {filter !== 'all' && (
                 <button 
-                  className="dashboard-refresh-btn"
+                  className="action-btn primary"
                   onClick={() => setFilter('all')}
                 >
                   Show All Assignments
                 </button>
               )}
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </main>
       {showDetailModal && selectedAssignment && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
-              <div className="modal-icon">{getCourseIcon(selectedAssignment.class_id)}</div>
-              <button 
-                className="modal-close"
-                onClick={() => setShowDetailModal(false)}
-              >
-                ✕
-              </button>
+        <div className="modal-overlay" onClick={() => setShowDetailModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header-gradient">
+              <div className="modal-header-content">
+                <div className="modal-title-section">
+                  <div className="modal-icon">
+                    {getCourseIcon(selectedAssignment.class_id)}
+                  </div>
+                  <div>
+                    <h3>{selectedAssignment.title}</h3>
+                    <p>Assignment details and information</p>
+                  </div>
+                </div>
+                <button 
+                  className="modal-close-btn"
+                  onClick={() => setShowDetailModal(false)}
+                >
+                  ×
+                </button>
+              </div>
             </div>
             
-            <h3>{selectedAssignment.title}</h3>
-            
-            <div className="modal-badges">
-              <span 
-                className="status-badge"
-                style={{ 
-                  background: getStatusColor(selectedAssignment.status),
-                  color: 'white'
-                }}
-              >
-                {getStatusIcon(selectedAssignment.status)} {selectedAssignment.status}
-              </span>
-              <span 
-                className="priority-badge"
-                style={{ 
-                  background: getPriorityColor(selectedAssignment.priority),
-                  color: 'white'
-                }}
-              >
-                {selectedAssignment.priority} Priority
-              </span>
-            </div>
-
-            <div className="modal-details">
-              <div className="modal-detail-row">
-                <span className="detail-label">Course</span>
-                <span className="detail-value">{selectedAssignment.class_id || 'Unknown'}</span>
-              </div>
-              <div className="modal-detail-row">
-                <span className="detail-label">Due Date</span>
-                <span className="detail-value">{formatDueDate(selectedAssignment.due_date)}</span>
-              </div>
-              <div className="modal-detail-row">
-                <span className="detail-label">Assigned</span>
-                <span className="detail-value">
-                  {selectedAssignment.created_at ? new Date(selectedAssignment.created_at).toLocaleDateString() : 'Unknown'}
+            <div className="modal-body-custom">
+              <div className="modal-badges">
+                <span 
+                  className="status-badge large"
+                  style={{ 
+                    background: getStatusColor(selectedAssignment.status),
+                    color: 'white'
+                  }}
+                >
+                  {getStatusIcon(selectedAssignment.status)} {selectedAssignment.status}
+                </span>
+                <span 
+                  className="priority-badge large"
+                  style={{ 
+                    background: getPriorityColor(selectedAssignment.priority),
+                    color: 'white'
+                  }}
+                >
+                  {selectedAssignment.priority} Priority
                 </span>
               </div>
-            </div>
 
-            <div className="modal-section">
-              <h4>Assignment Details</h4>
-              <p>{selectedAssignment.description || 'No description provided.'}</p>
-            </div>
+              <div className="modal-details-grid">
+                <div className="detail-card">
+                  <div className="detail-icon">📚</div>
+                  <div className="detail-content">
+                    <span className="detail-label">Course</span>
+                    <span className="detail-value">{selectedAssignment.class_id || 'Unknown'}</span>
+                  </div>
+                </div>
+                
+                <div className="detail-card">
+                  <div className="detail-icon">📅</div>
+                  <div className="detail-content">
+                    <span className="detail-label">Due Date</span>
+                    <span className="detail-value">{formatDueDate(selectedAssignment.due_date)}</span>
+                  </div>
+                </div>
+                
+                <div className="detail-card">
+                  <div className="detail-icon">🕐</div>
+                  <div className="detail-content">
+                    <span className="detail-label">Assigned</span>
+                    <span className="detail-value">
+                      {selectedAssignment.created_at ? new Date(selectedAssignment.created_at).toLocaleDateString() : 'Unknown'}
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="detail-card">
+                  <div className="detail-icon">⭐</div>
+                  <div className="detail-content">
+                    <span className="detail-label">Points</span>
+                    <span className="detail-value points">{selectedAssignment.points || 'N/A'}</span>
+                  </div>
+                </div>
+              </div>
 
-            <div className="modal-actions">
-              <button className="dashboard-refresh-btn" style={{ flex: 1 }}>
-                <span>✏️</span>
-                Edit Assignment
-              </button>
-              <button 
-                className="dashboard-refresh-btn"
-                style={{ 
-                  background: 'linear-gradient(135deg, #00B894 0%, #00806a 100%)',
-                  flex: 1
-                }}
-              >
-                <span>📥</span>
-                Download Materials
-              </button>
+              <div className="modal-section">
+                <h4 className="section-title">Assignment Description</h4>
+                <p className="description-text">
+                  {selectedAssignment.description || 'No description provided.'}
+                </p>
+              </div>
+
+              <div className="modal-actions">
+                <button className="modal-btn secondary">
+                  <span className="btn-icon">✏️</span>
+                  Edit Assignment
+                </button>
+                <button 
+                  className="modal-btn primary"
+                >
+                  <span className="btn-icon">📥</span>
+                  Download Materials
+                </button>
+              </div>
             </div>
           </div>
         </div>

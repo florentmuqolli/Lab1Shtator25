@@ -42,7 +42,7 @@ const TeacherGrades = () => {
 
   const fetchStudentsForClass = async (classId) => {
     try {
-      const res = await axiosInstance.get(`/enrollment/${classId}/students`);
+      const res = await axiosInstance.get(`/enrollments/${classId}/students`);
       setStudents(res.data);
     } catch (error) {
       console.error("Error fetching students:", error);

@@ -24,6 +24,8 @@ import EnrollmentFormModal from './views/admin/utils/EnrollmentFormModal';
 import CourseFormModal from './views/admin/utils/CourseFormModal';
 import TeacherFormModal from './views/admin/utils/TeacherFormModal';
 import PendingRequests from './views/admin/utils/PendingRequests';
+import TeamManagement from './views/admin/TeamManagement';
+import PlayerManagement from './views/admin/PlayerManagement';
 
 
 import StudentDashboard from './views/student/StudentHome';
@@ -51,6 +53,7 @@ function Layout() {
     "/course-management",
     "/teachermanagement",
     "/enrollment-management",
+    "/team-management",
     "/enrollmentformmodal",
     "/courseformmodal", 
     "/teacherformmodal",
@@ -76,6 +79,7 @@ function Layout() {
     "/course-management",
     "/teachermanagement",
     "/enrollment-management",
+    "/team-management",
     "/enrollmentformmodal",
     "/courseformmodal", 
     "/teacherformmodal",
@@ -117,6 +121,8 @@ function Layout() {
         <Route path="/courseformmodal" element={<CourseFormModal />} />
         <Route path="/teacherformmodal" element={<TeacherFormModal />} />
         <Route path="/pending-requests" element={<PendingRequests />} />
+        <Route path="/team-management" element={<TeamManagement />} />
+        <Route path="/player-management" element={<PlayerManagement />} />
 
 
         <Route path="/student-profile" element={<StudentProfile />} />

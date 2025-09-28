@@ -228,6 +228,8 @@ const AdminDashboard = () => {
                   { icon: '➕', text: 'Add Course', color: '#00B894', action: () => navigate('/course-management') },
                   { icon: '📊', text: 'Requests', color: '#FD79A8', action: () => navigate('/pending-requests') },
                   { icon: '⚙️', text: 'Enrollments', color: '#FDCB6E', action: () => navigate('/enrollment-management') },
+                  { icon: '⚙️', text: 'Teams', color: '#FDCB6E', action: () => navigate('/team-management') },
+                  { icon: '⚙️', text: 'Players', color: '#FDCB6E', action: () => navigate('/player-management') },
                 ].map((item, index) => (
                   <button
                     key={index}
